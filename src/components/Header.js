@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Menu, X, Gift, Hammer, User } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Header() {
   const [menuOuvert, setMenuOuvert] = useState(false);
+  const { user, loading } = useAuth();
 
   const liens = [
     { href: '/dons', label: 'Dons', icon: Gift },
@@ -37,20 +39,33 @@ export default function Header() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <Link
-            href="/connexion"
-            className="text-sm font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition"
-            style={{ color: 'var(--txt2)' }}
-          >
-            Connexion
-          </Link>
-          <Link
-            href="/inscription"
-            className="text-sm font-bold px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
-            style={{ backgroundColor: 'var(--bord)' }}
-          >
-            S'inscrire
-          </Link>
+          {!loading && user ? (
+            <Link
+              href="/profil"
+              className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg hover:opacity-80 transition"
+              style={{ color: 'var(--txt) ' }}
+            >
+              <User size={16} />
+              {user.prenom}
+            </Link>
+          ) : !loading ? (
+            <>
+              <Link
+                href="/connexion"
+                className="text-sm font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition"
+                style={{ color: 'var(--txt2)' }}
+              >
+                Connexion
+              </Link>
+              <Link
+                href="/inscription"
+                className="text-sm font-bold px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
+                style={{ backgroundColor: 'var(--bord)' }}
+              >
+                S'inscrire
+              </Link>
+            </>
+          ) : null}
         </div>
 
         <button
@@ -76,22 +91,36 @@ export default function Header() {
               {label}
             </Link>
           ))}
-          <Link
-            href="/connexion"
-            onClick={() => setMenuOuvert(false)}
-            className="text-sm font-semibold py-2"
-            style={{ color: 'var(--txt2)' }}
-          >
-            Connexion
-          </Link>
-          <Link
-            href="/inscription"
-            onClick={() => setMenuOuvert(false)}
-            className="text-sm font-bold py-3 rounded-lg text-white text-center"
-            style={{ backgroundColor: 'var(--bord)' }}
-          >
-            S'inscrire
-          </Link>
+          {!loading && user ? (
+            <Link
+              href="/profil"
+              onClick={() => setMenuOuvert(false)}
+              className="flex items-center gap-2 text-sm font-semibold py-2"
+              style={{ color: 'var(--txt2)' }}
+            >
+              <User size={18} />
+              {user.prenom}
+            </Link>
+          ) : !loading ? (
+            <>
+              <Link
+                href="/connexion"
+                onClick={() => setMenuOuvert(false)}
+                className="text-sm font-semibold py-2"
+                style={{ color: 'var(--txt2)' }}
+              >
+                Connexion
+              </Link>
+              <Link
+                href="/inscription"
+                onClick={() => setMenuOuvert(false)}
+                className="text-sm font-bold py-3 rounded-lg text-white text-center"
+                style={{ backgroundColor: 'var(--bord)' }}
+              >
+                S'inscrire
+              </Link>
+            </>
+          ) : null}
         </div>
       )}
     </header>
