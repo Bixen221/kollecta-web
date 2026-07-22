@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Gift, MapPin, LogOut, Moon, Sun } from 'lucide-react';
+import Link from 'next/link';
+import { Star, MapPin, LogOut, Moon, Sun, Pencil } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -27,7 +28,6 @@ export default function ProfilPage() {
     <main style={{ backgroundColor: 'var(--bg)', minHeight: 'calc(100vh - 73px)' }}>
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
 
-        {/* HEADER PROFIL */}
         <div
           className="rounded-2xl border p-8 flex flex-col items-center text-center mb-6"
           style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}
@@ -55,7 +55,6 @@ export default function ProfilPage() {
           </span>
         </div>
 
-        {/* STATS */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="rounded-xl border p-4 text-center" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}>
             <p className="text-xl font-extrabold" style={{ color: 'var(--bord)' }}>{user.nb_dons || 0}</p>
@@ -73,12 +72,24 @@ export default function ProfilPage() {
           </div>
         </div>
 
-        {/* MENU */}
         <div className="rounded-2xl border overflow-hidden mb-6" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}>
-          <button
-            onClick={toggleTheme}
+          <Link
+            href="/profil/modifier"
             className="w-full flex items-center gap-3 p-4 border-b hover:opacity-80 transition"
             style={{ borderColor: 'var(--bd)' }}
+          >
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--card2)' }}>
+              <Pencil size={16} style={{ color: 'var(--txt)' }} />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-sm font-semibold" style={{ color: 'var(--txt)' }}>Modifier mon profil</p>
+              <p className="text-xs" style={{ color: 'var(--txt2)' }}>Photo, nom, contact, localisation</p>
+            </div>
+          </Link>
+
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center gap-3 p-4 hover:opacity-80 transition"
           >
             <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--card2)' }}>
               {isDark ? <Moon size={16} style={{ color: 'var(--txt)' }} /> : <Sun size={16} style={{ color: 'var(--txt)' }} />}
@@ -90,7 +101,6 @@ export default function ProfilPage() {
           </button>
         </div>
 
-        {/* DECONNEXION */}
         <button
           onClick={deconnexion}
           className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold border hover:opacity-80 transition"
