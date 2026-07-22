@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Star, MapPin, LogOut, Moon, Sun, Pencil } from 'lucide-react';
+import { Star, MapPin, LogOut, Moon, Sun, Pencil, Gift, ClipboardList } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -73,6 +73,34 @@ export default function ProfilPage() {
         </div>
 
         <div className="rounded-2xl border overflow-hidden mb-6" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}>
+          <Link
+            href="/profil/mes-dons"
+            className="w-full flex items-center gap-3 p-4 border-b hover:opacity-80 transition"
+            style={{ borderColor: 'var(--bd)' }}
+          >
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--card2)' }}>
+              <Gift size={16} style={{ color: 'var(--txt)' }} />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-sm font-semibold" style={{ color: 'var(--txt)' }}>Mes dons publiés</p>
+              <p className="text-xs" style={{ color: 'var(--txt2)' }}>Gérer mes annonces actives</p>
+            </div>
+          </Link>
+
+          <Link
+            href="/profil/mes-reservations"
+            className="w-full flex items-center gap-3 p-4 border-b hover:opacity-80 transition"
+            style={{ borderColor: 'var(--bd)' }}
+          >
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--card2)' }}>
+              <ClipboardList size={16} style={{ color: 'var(--txt)' }} />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-sm font-semibold" style={{ color: 'var(--txt)' }}>Mes réservations</p>
+              <p className="text-xs" style={{ color: 'var(--txt2)' }}>Suivre mes demandes de dons</p>
+            </div>
+          </Link>
+
           <Link
             href="/profil/modifier"
             className="w-full flex items-center gap-3 p-4 border-b hover:opacity-80 transition"
