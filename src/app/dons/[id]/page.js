@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, Star } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, ChevronRight } from 'lucide-react';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 
@@ -130,20 +130,24 @@ export default function DetailDonPage() {
               <p className="text-sm" style={{ color: 'var(--txt2)' }}>{don.quantite_dispo}/{don.quantite_total} disponibles</p>
             </div>
 
-            <div className="mb-6 flex items-center gap-3">
+            <Link
+              href={`/profil-public/${don.proprietaire_id}?nom=${encodeURIComponent(don.nom)}&prenom=${encodeURIComponent(don.prenom)}`}
+              className="mb-6 flex items-center gap-3 hover:opacity-80 transition"
+            >
               <div
                 className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm"
                 style={{ backgroundColor: 'var(--bord)' }}
               >
                 {don.prenom?.[0]}{don.nom?.[0]}
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-bold text-sm" style={{ color: 'var(--txt)' }}>{don.prenom} {don.nom}</p>
                 <p className="flex items-center gap-1 text-xs" style={{ color: 'var(--txt2)' }}>
                   <Star size={12} /> {don.note_moyenne} · {don.nb_dons} dons
                 </p>
               </div>
-            </div>
+              <ChevronRight size={18} style={{ color: 'var(--txt3)' }} />
+            </Link>
 
             {erreur && (
               <div className="mb-4 px-4 py-3 rounded-lg text-sm font-medium" style={{ backgroundColor: '#FDE8EB', color: '#8B1A2A' }}>

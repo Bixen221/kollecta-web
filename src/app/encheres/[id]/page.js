@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, Star } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, ChevronRight } from 'lucide-react';
 import { io } from 'socket.io-client';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
@@ -127,7 +127,6 @@ export default function DetailEncherePage() {
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* PHOTOS */}
           <div>
             <div
               className="h-80 rounded-2xl overflow-hidden flex items-center justify-center border relative"
@@ -162,14 +161,12 @@ export default function DetailEncherePage() {
             )}
           </div>
 
-          {/* INFOS */}
           <div>
             <h1 className="text-2xl font-extrabold mb-2" style={{ color: 'var(--txt)' }}>{enchere.titre}</h1>
             <p className="flex items-center gap-1.5 text-sm mb-6" style={{ color: 'var(--txt2)' }}>
               <MapPin size={15} /> {enchere.quartier}, {enchere.ville}
             </p>
 
-            {/* TIMER */}
             {estEnCours && temps && (
               <div
                 className="rounded-2xl p-5 mb-4 text-center border"
@@ -180,7 +177,6 @@ export default function DetailEncherePage() {
               </div>
             )}
 
-            {/* PRIX */}
             <div
               className="rounded-2xl p-5 mb-6 flex justify-between items-center border"
               style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}
@@ -204,17 +200,21 @@ export default function DetailEncherePage() {
               </div>
             )}
 
-            <div className="mb-6 flex items-center gap-3">
+            <Link
+              href={`/profil-public/${enchere.vendeur_id}?nom=${encodeURIComponent(enchere.nom)}&prenom=${encodeURIComponent(enchere.prenom)}`}
+              className="mb-6 flex items-center gap-3 hover:opacity-80 transition"
+            >
               <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: 'var(--bord)' }}>
                 {enchere.prenom?.[0]}{enchere.nom?.[0]}
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-bold text-sm" style={{ color: 'var(--txt)' }}>{enchere.prenom} {enchere.nom}</p>
                 <p className="flex items-center gap-1 text-xs" style={{ color: 'var(--txt2)' }}>
                   <Star size={12} /> {enchere.note_moyenne}
                 </p>
               </div>
-            </div>
+              <ChevronRight size={18} style={{ color: 'var(--txt3)' }} />
+            </Link>
 
             {erreur && (
               <div className="mb-4 px-4 py-3 rounded-lg text-sm font-medium" style={{ backgroundColor: '#FDE8EB', color: '#8B1A2A' }}>
@@ -253,7 +253,6 @@ export default function DetailEncherePage() {
           </div>
         </div>
 
-        {/* HISTORIQUE */}
         <div className="mt-10">
           <h3 className="text-lg font-extrabold mb-4" style={{ color: 'var(--txt)' }}>Historique des offres</h3>
           {offres.length === 0 ? (
