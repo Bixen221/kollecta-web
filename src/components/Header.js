@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, X, Gift, Hammer, User } from 'lucide-react';
+import { Menu, X, Gift, Hammer, User, Plus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Header() {
@@ -36,6 +36,16 @@ export default function Header() {
               {label}
             </Link>
           ))}
+          {!loading && user && (
+            <Link
+              href="/publier"
+              className="flex items-center gap-1.5 text-sm font-semibold hover:opacity-70 transition"
+              style={{ color: 'var(--txt2)' }}
+            >
+              <Plus size={16} />
+              Publier
+            </Link>
+          )}
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
@@ -43,7 +53,7 @@ export default function Header() {
             <Link
               href="/profil"
               className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg hover:opacity-80 transition"
-              style={{ color: 'var(--txt) ' }}
+              style={{ color: 'var(--txt)' }}
             >
               <User size={16} />
               {user.prenom}
@@ -91,6 +101,17 @@ export default function Header() {
               {label}
             </Link>
           ))}
+          {!loading && user && (
+            <Link
+              href="/publier"
+              onClick={() => setMenuOuvert(false)}
+              className="flex items-center gap-2 text-sm font-semibold py-2"
+              style={{ color: 'var(--txt2)' }}
+            >
+              <Plus size={18} />
+              Publier
+            </Link>
+          )}
           {!loading && user ? (
             <Link
               href="/profil"
