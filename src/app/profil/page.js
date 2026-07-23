@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Star, MapPin, LogOut, Moon, Sun, Pencil, Gift, ClipboardList, Bell, MessageCircle } from 'lucide-react';
+import { Star, MapPin, LogOut, Moon, Sun, Pencil, Gift, ClipboardList, Bell, MessageCircle, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -73,6 +73,21 @@ export default function ProfilPage() {
         </div>
 
         <div className="rounded-2xl border overflow-hidden mb-6" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}>
+          {user.est_admin && (
+            <Link
+              href="/admin"
+              className="hover-surface w-full flex items-center gap-3 p-4 border-b transition"
+              style={{ borderColor: 'var(--bd)' }}
+            >
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--orl)' }}>
+                <ShieldCheck size={16} style={{ color: 'var(--or)' }} />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-sm font-semibold" style={{ color: 'var(--or)' }}>Interface Admin</p>
+                <p className="text-xs" style={{ color: 'var(--txt2)' }}>Tableau de bord et statistiques</p>
+              </div>
+            </Link>
+          )}
           <Link
             href="/profil/notifications"
             className="hover-surface w-full flex items-center gap-3 p-4 border-b transition"

@@ -56,7 +56,7 @@ export default function ConnexionPage() {
             </label>
             <input
               type="tel"
-              placeholder="+221771234567"
+              placeholder="771234567"
               value={whatsapp}
               onChange={(e) => setWhatsapp(e.target.value)}
               required
