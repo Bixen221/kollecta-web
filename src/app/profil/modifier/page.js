@@ -6,14 +6,24 @@ import Link from 'next/link';
 import { ArrowLeft, Camera } from 'lucide-react';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
+import SelecteurPays from '@/components/SelecteurPays';
+import { PAYS, paysParDefaut } from '@/data/pays';
 
 const API_URL = 'https://kollecta-backend.onrender.com/api';
+
+const detecterPays = (whatsapp) => {
+  if (!whatsapp) return { pays: paysParDefaut, numeroLocal: '' };
+  const trouve = PAYS.find(p => whatsapp.startsWith(p.indicatif));
+  if (trouve) return { pays: trouve, numeroLocal: whatsapp.slice(trouve.indicatif.length) };
+  return { pays: paysParDefaut, numeroLocal: whatsapp.replace(/^\+/, '') };
+};
 
 export default function ModifierProfilPage() {
   const { user, loading: authLoading, setUser } = useAuth();
   const router = useRouter();
 
-  const [form, setForm] = useState({ nom: '', prenom: '', whatsapp: '', quartier: '', ville: '' });
+  const [pays, setPays] = useState(paysParDefaut);
+  const [form, setForm] = useState({ nom: '', prenom: '', numeroLocal: '', quartier: '', ville: '' });
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [avatarFile,    setAvatarFile]    = useState(null);
   const [loading, setLoading] = useState(false);
@@ -22,8 +32,10 @@ export default function ModifierProfilPage() {
   useEffect(() => {
     if (!authLoading && !user) router.push('/connexion');
     if (user) {
+      const { pays: paysDetecte, numeroLocal } = detecterPays(user.whatsapp);
+      setPays(paysDetecte);
       setForm({
-        nom: user.nom || '', prenom: user.prenom || '', whatsapp: user.whatsapp || '',
+        nom: user.nom || '', prenom: user.prenom || '', numeroLocal,
         quartier: user.quartier || '', ville: user.ville || '',
       });
       setAvatarPreview(user.avatar_url || null);
@@ -31,6 +43,11 @@ export default function ModifierProfilPage() {
   }, [authLoading, user]);
 
   const update = (key, val) => setForm(f => ({ ...f, [key]: val }));
+
+  const handleNumeroChange = (val) => {
+    const chiffres = val.replace(/\D/g, '').slice(0, pays.longueur);
+    update('numeroLocal', chiffres);
+  };
 
   const handlePhoto = (e) => {
     const file = e.target.files?.[0];
@@ -42,6 +59,11 @@ export default function ModifierProfilPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErreur('');
+
+    if (form.numeroLocal.length !== pays.longueur) {
+      return setErreur(`Le numéro doit contenir ${pays.longueur} chiffres pour ${pays.nom}.`);
+    }
+
     setLoading(true);
     try {
       if (avatarFile) {
@@ -61,7 +83,11 @@ export default function ModifierProfilPage() {
         if (!data.success) throw new Error(data.message);
       }
 
-      const res = await api.put('/auth/profil', form);
+      const whatsapp = pays.indicatif + form.numeroLocal;
+      const res = await api.put('/auth/profil', {
+        nom: form.nom, prenom: form.prenom, whatsapp,
+        quartier: form.quartier, ville: form.ville,
+      });
       setUser(res.user);
       router.push('/profil');
     } catch (err) {
@@ -90,7 +116,6 @@ export default function ModifierProfilPage() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
-          {/* AVATAR */}
           <div className="flex flex-col items-center mb-4">
             <label className="relative cursor-pointer">
               <div
@@ -138,12 +163,21 @@ export default function ModifierProfilPage() {
             </div>
 
             <div>
-              <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>WhatsApp</label>
-              <input
-                type="tel" value={form.whatsapp} onChange={(e) => update('whatsapp', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border outline-none focus:ring-2"
-                style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
-              />
+              <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Numéro WhatsApp</label>
+              <div className="flex gap-2">
+                <SelecteurPays paysSelectionne={pays} onChange={(p) => { setPays(p); update('numeroLocal', ''); }} />
+                <input
+                  type="tel" placeholder={'X'.repeat(pays.longueur)}
+                  value={form.numeroLocal} onChange={(e) => handleNumeroChange(e.target.value)}
+                  className="flex-1 min-w-0 px-4 py-3 rounded-lg border outline-none focus:ring-2"
+                  style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                />
+              </div>
+              {form.numeroLocal.length > 0 && (
+                <p className="text-xs mt-1.5" style={{ color: form.numeroLocal.length === pays.longueur ? 'var(--gr)' : 'var(--txt3)' }}>
+                  {form.numeroLocal.length}/{pays.longueur} chiffres
+                </p>
+              )}
             </div>
           </div>
 

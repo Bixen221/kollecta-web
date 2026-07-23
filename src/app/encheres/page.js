@@ -14,6 +14,8 @@ const getTempsRestant = (fin_le) => {
   return h + 'h ' + m + 'm';
 };
 
+const estReellementTerminee = (e) => e.statut === 'termine' || new Date(e.fin_le) <= new Date();
+
 export default function EncheresPage() {
   const [encheres,  setEncheres]  = useState([]);
   const [loading,   setLoading]   = useState(true);
@@ -26,11 +28,7 @@ export default function EncheresPage() {
     const charger = async () => {
       setLoading(true);
       try {
-        const params = {};
-        if (filtre === 'En cours')  params.statut = 'en_cours';
-        if (filtre === 'À venir')   params.statut = 'a_venir';
-        if (filtre === 'Terminées') params.statut = 'termine';
-        const res = await api.get('/encheres', { params });
+        const res = await api.get('/encheres');
         setEncheres(res.encheres || []);
       } catch (err) {
         console.error(err);
@@ -39,13 +37,21 @@ export default function EncheresPage() {
       }
     };
     charger();
-  }, [filtre]);
+  }, []);
 
-  const encheresFiltres = encheres.filter(e =>
-    e.titre?.toLowerCase().includes(recherche.toLowerCase()) ||
-    e.quartier?.toLowerCase().includes(recherche.toLowerCase()) ||
-    e.categorie?.toLowerCase().includes(recherche.toLowerCase())
-  );
+  const encheresFiltres = encheres.filter(e => {
+    const correspondRecherche =
+      e.titre?.toLowerCase().includes(recherche.toLowerCase()) ||
+      e.quartier?.toLowerCase().includes(recherche.toLowerCase()) ||
+      e.categorie?.toLowerCase().includes(recherche.toLowerCase());
+    if (!correspondRecherche) return false;
+
+    const terminee = estReellementTerminee(e);
+    if (filtre === 'En cours')  return !terminee && e.statut === 'en_cours';
+    if (filtre === 'À venir')   return e.statut === 'a_venir' && !terminee;
+    if (filtre === 'Terminées') return terminee;
+    return true;
+  });
 
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: 'calc(100vh - 73px)' }}>
@@ -112,11 +118,11 @@ export default function EncheresPage() {
                   )}
                   <span
                     className="absolute top-3 left-3 text-white text-xs font-bold px-2.5 py-1 rounded-full"
-                    style={{ backgroundColor: e.statut === 'en_cours' ? 'var(--bord)' : 'var(--txt3)' }}
+                    style={{ backgroundColor: estReellementTerminee(e) ? 'var(--txt3)' : (e.statut === 'en_cours' ? 'var(--bord)' : 'var(--txt3)') }}
                   >
-                    {e.statut === 'en_cours' ? '🔴 EN DIRECT' : e.statut === 'a_venir' ? 'À venir' : 'Terminée'}
+                    {estReellementTerminee(e) ? 'Terminée' : (e.statut === 'en_cours' ? '🔴 EN DIRECT' : 'À venir')}
                   </span>
-                  {e.statut === 'en_cours' && (
+                  {!estReellementTerminee(e) && e.statut === 'en_cours' && (
                     <span className="absolute bottom-3 right-3 bg-black/70 text-white text-xs font-bold px-2.5 py-1 rounded-full">
                       ⏱ {getTempsRestant(e.fin_le)}
                     </span>

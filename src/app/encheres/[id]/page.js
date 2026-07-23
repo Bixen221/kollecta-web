@@ -116,7 +116,8 @@ export default function DetailEncherePage() {
 
   const photos = enchere.photos?.filter(Boolean) || [];
   const estVendeur = user?.id === enchere.vendeur_id;
-  const estEnCours = enchere.statut === 'en_cours';
+  const estTerminee = enchere.statut === 'termine' || new Date(enchere.fin_le) <= new Date();
+  const estEnCours = enchere.statut === 'en_cours' && !estTerminee;
   const estGagnant = enchere.meilleur_offrant_id === user?.id;
 
   return (
@@ -237,8 +238,7 @@ export default function DetailEncherePage() {
                 <button
                   onClick={handlePlacerOffre}
                   disabled={placing}
-                  className="px-6 py-3 rounded-xl font-bold text-white hover:opacity-90 transition disabled:opacity-60"
-                  style={{ backgroundColor: 'var(--bord)' }}
+                  className="btn-action px-6 py-3 rounded-xl font-bold text-white transition disabled:opacity-60"
                 >
                   {placing ? '...' : '🔨 Enchérir'}
                 </button>

@@ -2,6 +2,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { ReservationsProvider } from "@/context/ReservationsContext";
 
 export const metadata = {
   metadataBase: new URL('https://kollecta-web-teal.vercel.app'),
@@ -37,8 +38,10 @@ export default function RootLayout({ children }) {
       <body className="antialiased">
         <ThemeProvider>
           <AuthProvider>
-            <Header />
-            {children}
+            <ReservationsProvider>
+              <Header />
+              {children}
+            </ReservationsProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

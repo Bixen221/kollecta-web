@@ -6,15 +6,16 @@ import Link from 'next/link';
 import { ArrowLeft, MapPin, Star, ChevronRight } from 'lucide-react';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
+import { useReservations } from '@/context/ReservationsContext';
 
 export default function DetailDonPage() {
   const { id } = useParams();
   const router = useRouter();
   const { user } = useAuth();
+  const { estReserve, getReservation, charger: rechargerResas } = useReservations();
   const [don,     setDon]     = useState(null);
   const [loading, setLoading] = useState(true);
   const [photoActive, setPhotoActive] = useState(0);
-  const [reservation, setReservation] = useState(null);
   const [erreur, setErreur] = useState('');
 
   useEffect(() => {
@@ -35,8 +36,20 @@ export default function DetailDonPage() {
     if (!user) return router.push('/connexion');
     setErreur('');
     try {
-      const res = await api.post(`/dons/${id}/reserver`);
-      setReservation(res.reservation);
+      await api.post(`/dons/${id}/reserver`);
+      await rechargerResas();
+    } catch (err) {
+      setErreur(err.message);
+    }
+  };
+
+  const handleAnnuler = async () => {
+    const resa = getReservation(id);
+    if (!resa) return;
+    if (!confirm('Voulez-vous annuler votre réservation ?')) return;
+    try {
+      await api.post(`/dons/reservations/${resa.id}/confirmer`, { role: 'annuler' });
+      await rechargerResas();
     } catch (err) {
       setErreur(err.message);
     }
@@ -155,20 +168,29 @@ export default function DetailDonPage() {
               </div>
             )}
 
-            {reservation ? (
-              <div className="px-4 py-4 rounded-xl text-sm font-semibold" style={{ backgroundColor: 'var(--grl)', color: 'var(--gr)' }}>
-                ✓ Réservation confirmée ! Le propriétaire vous contactera sur WhatsApp dans les 48h.
-              </div>
-            ) : estProprio ? (
+            {estProprio ? (
               <div className="px-4 py-4 rounded-xl text-sm font-semibold text-center" style={{ backgroundColor: 'var(--card2)', color: 'var(--txt2)' }}>
                 Ceci est votre annonce
+              </div>
+            ) : estReserve(id) ? (
+              <div className="flex flex-col gap-3">
+                <div className="px-4 py-4 rounded-xl text-sm font-semibold" style={{ backgroundColor: 'var(--grl)', color: 'var(--gr)' }}>
+                  ✓ Réservé ! Le propriétaire vous contactera sur WhatsApp dans les 48h.
+                </div>
+                <button
+                  onClick={handleAnnuler}
+                  className="w-full py-3 rounded-xl font-bold border"
+                  style={{ backgroundColor: '#FDE8EB', borderColor: '#FF6B6B', color: '#CC2222' }}
+                >
+                  Annuler la réservation
+                </button>
               </div>
             ) : (
               <button
                 onClick={handleReserver}
                 disabled={plusDispo}
-                className="w-full py-3.5 rounded-xl font-bold text-white hover:opacity-90 transition disabled:opacity-50"
-                style={{ backgroundColor: plusDispo ? 'var(--txt3)' : 'var(--bord)' }}
+                className={`w-full py-3.5 rounded-xl font-bold text-white transition disabled:opacity-50 ${!plusDispo ? 'btn-action' : ''}`}
+                style={{ backgroundColor: plusDispo ? 'var(--txt3)' : undefined }}
               >
                 {plusDispo ? 'Plus disponible' : 'Réserver ce don'}
               </button>

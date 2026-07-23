@@ -14,6 +14,8 @@
   --bordl:   #FDE8EB;
   --gr:      #2D7A4F;
   --grl:     #E8F5EE;
+  --bleu:    #2563EB;
+  --bleuh:   #1D4ED8;
 }
 
 .dark {
@@ -30,10 +32,24 @@
   --bordl:   rgba(224,90,106,0.2);
   --gr:      #2D7A4F;
   --grl:     rgba(45,122,79,0.2);
+  --bleu:    #3B82F6;
+  --bleuh:   #2563EB;
 }
 
 body {
   background-color: var(--bg);
   color: var(--txt);
   transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-action {
+  background-color: var(--bleu);
+  transition: background-color 0.15s;
+}
+.btn-action:hover {
+  background-color: var(--bleuh);
+}
+
+.btn-hover-fade:hover {
+  filter: brightness(0.92);
 }
