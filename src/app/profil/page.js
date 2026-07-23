@@ -75,7 +75,7 @@ export default function ProfilPage() {
         <div className="rounded-2xl border overflow-hidden mb-6" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}>
           <Link
             href="/profil/notifications"
-            className="w-full flex items-center gap-3 p-4 border-b hover:opacity-80 transition"
+            className="hover-surface w-full flex items-center gap-3 p-4 border-b transition"
             style={{ borderColor: 'var(--bd)' }}
           >
             <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--card2)' }}>
@@ -89,7 +89,7 @@ export default function ProfilPage() {
 
           <Link
             href="/profil/messages"
-            className="w-full flex items-center gap-3 p-4 border-b hover:opacity-80 transition"
+            className="hover-surface w-full flex items-center gap-3 p-4 border-b transition"
             style={{ borderColor: 'var(--bd)' }}
           >
             <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--card2)' }}>
@@ -103,7 +103,7 @@ export default function ProfilPage() {
 
           <Link
             href="/profil/mes-dons"
-            className="w-full flex items-center gap-3 p-4 border-b hover:opacity-80 transition"
+            className="hover-surface w-full flex items-center gap-3 p-4 border-b transition"
             style={{ borderColor: 'var(--bd)' }}
           >
             <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--card2)' }}>
@@ -117,7 +117,7 @@ export default function ProfilPage() {
 
           <Link
             href="/profil/mes-reservations"
-            className="w-full flex items-center gap-3 p-4 border-b hover:opacity-80 transition"
+            className="hover-surface w-full flex items-center gap-3 p-4 border-b transition"
             style={{ borderColor: 'var(--bd)' }}
           >
             <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--card2)' }}>
@@ -131,7 +131,7 @@ export default function ProfilPage() {
 
           <Link
             href="/profil/modifier"
-            className="w-full flex items-center gap-3 p-4 border-b hover:opacity-80 transition"
+            className="hover-surface w-full flex items-center gap-3 p-4 border-b transition"
             style={{ borderColor: 'var(--bd)' }}
           >
             <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--card2)' }}>
@@ -145,7 +145,7 @@ export default function ProfilPage() {
 
           <button
             onClick={toggleTheme}
-            className="w-full flex items-center gap-3 p-4 hover:opacity-80 transition"
+            className="hover-surface w-full flex items-center gap-3 p-4 transition"
           >
             <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--card2)' }}>
               {isDark ? <Moon size={16} style={{ color: 'var(--txt)' }} /> : <Sun size={16} style={{ color: 'var(--txt)' }} />}
@@ -159,7 +159,7 @@ export default function ProfilPage() {
 
         <button
           onClick={deconnexion}
-          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold border hover:opacity-80 transition"
+          className="btn-hover-fade w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold border transition"
           style={{ borderColor: '#FFCDD2', color: '#CC2222', backgroundColor: 'var(--card)' }}
         >
           <LogOut size={16} /> Se déconnecter

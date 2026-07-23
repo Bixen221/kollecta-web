@@ -44,12 +44,42 @@ body {
 
 .btn-action {
   background-color: var(--bleu);
-  transition: background-color 0.15s;
+  transition: all 0.15s;
 }
 .btn-action:hover {
   background-color: var(--bleuh);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
 }
 
+.btn-hover-fade {
+  transition: all 0.15s;
+}
 .btn-hover-fade:hover {
-  filter: brightness(0.92);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  filter: brightness(1.08);
+}
+
+.hover-surface {
+  transition: background-color 0.15s;
+}
+.hover-surface:hover {
+  background-color: var(--card2);
+}
+
+.hover-lien {
+  transition: color 0.15s;
+}
+.hover-lien:hover {
+  color: var(--or) !important;
+}
+
+.hover-contour {
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+.hover-contour:hover {
+  border-color: var(--or);
+  background-color: var(--orl);
 }

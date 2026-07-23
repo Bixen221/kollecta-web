@@ -29,7 +29,7 @@ export default function Header() {
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-1.5 text-sm font-semibold hover:opacity-70 transition"
+              className="hover-contour flex items-center gap-1.5 text-sm font-semibold transition px-3 py-1.5 rounded-lg"
               style={{ color: 'var(--txt2)' }}
             >
               <Icon size={16} />
@@ -39,7 +39,7 @@ export default function Header() {
           {!loading && user && (
             <Link
               href="/publier"
-              className="flex items-center gap-1.5 text-sm font-semibold hover:opacity-70 transition"
+              className="hover-contour flex items-center gap-1.5 text-sm font-semibold transition px-3 py-1.5 rounded-lg"
               style={{ color: 'var(--txt2)' }}
             >
               <Plus size={16} />
@@ -52,7 +52,7 @@ export default function Header() {
           {!loading && user ? (
             <Link
               href="/profil"
-              className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg hover:opacity-80 transition"
+              className="hover-surface flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-lg transition"
               style={{ color: 'var(--txt)' }}
             >
               <User size={16} />
@@ -62,14 +62,14 @@ export default function Header() {
             <>
               <Link
                 href="/connexion"
-                className="text-sm font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition"
+                className="hover-surface text-sm font-semibold px-4 py-2 rounded-lg transition"
                 style={{ color: 'var(--txt2)' }}
               >
                 Connexion
               </Link>
               <Link
                 href="/inscription"
-                className="text-sm font-bold px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
+                className="btn-hover-fade text-sm font-bold px-4 py-2 rounded-lg text-white transition"
                 style={{ backgroundColor: 'var(--bord)' }}
               >
                 S'inscrire
@@ -79,7 +79,7 @@ export default function Header() {
         </div>
 
         <button
-          className="md:hidden"
+          className="hover-surface rounded-lg p-1.5 md:hidden"
           onClick={() => setMenuOuvert(!menuOuvert)}
           style={{ color: 'var(--txt)' }}
         >
@@ -94,7 +94,7 @@ export default function Header() {
               key={href}
               href={href}
               onClick={() => setMenuOuvert(false)}
-              className="flex items-center gap-2 text-sm font-semibold py-2"
+              className="hover-contour flex items-center gap-2 text-sm font-semibold py-2 px-2 rounded-lg"
               style={{ color: 'var(--txt2)' }}
             >
               <Icon size={18} />
@@ -105,7 +105,7 @@ export default function Header() {
             <Link
               href="/publier"
               onClick={() => setMenuOuvert(false)}
-              className="flex items-center gap-2 text-sm font-semibold py-2"
+              className="hover-contour flex items-center gap-2 text-sm font-semibold py-2 px-2 rounded-lg"
               style={{ color: 'var(--txt2)' }}
             >
               <Plus size={18} />
@@ -116,7 +116,7 @@ export default function Header() {
             <Link
               href="/profil"
               onClick={() => setMenuOuvert(false)}
-              className="flex items-center gap-2 text-sm font-semibold py-2"
+              className="hover-lien flex items-center gap-2 text-sm font-semibold py-2 px-2 rounded-lg"
               style={{ color: 'var(--txt2)' }}
             >
               <User size={18} />
@@ -127,7 +127,7 @@ export default function Header() {
               <Link
                 href="/connexion"
                 onClick={() => setMenuOuvert(false)}
-                className="text-sm font-semibold py-2"
+                className="hover-lien text-sm font-semibold py-2 px-2 rounded-lg"
                 style={{ color: 'var(--txt2)' }}
               >
                 Connexion
@@ -135,7 +135,7 @@ export default function Header() {
               <Link
                 href="/inscription"
                 onClick={() => setMenuOuvert(false)}
-                className="text-sm font-bold py-3 rounded-lg text-white text-center"
+                className="btn-hover-fade text-sm font-bold py-3 rounded-lg text-white text-center"
                 style={{ backgroundColor: 'var(--bord)' }}
               >
                 S'inscrire
