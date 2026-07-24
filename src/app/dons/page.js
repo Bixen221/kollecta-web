@@ -60,19 +60,27 @@ export default function DonsPage() {
         <h1 className="text-3xl font-extrabold mb-2" style={{ color: 'var(--txt)' }}>🎁 Dons</h1>
         <p className="text-sm mb-6" style={{ color: 'var(--txt2)' }}>Trouvez un don près de chez vous</p>
 
-        <div
-          className="flex items-center gap-2 px-4 py-3 rounded-xl border mb-4 max-w-md"
-          style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}
-        >
-          <Search size={16} style={{ color: 'var(--txt3)' }} />
-          <input
-            type="text"
-            placeholder="Rechercher un don..."
-            value={recherche}
-            onChange={(e) => setRecherche(e.target.value)}
-            className="flex-1 outline-none bg-transparent text-sm"
-            style={{ color: 'var(--txt)' }}
-          />
+        <div className="flex items-center gap-2 mb-4 max-w-md">
+          <div
+            className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl border"
+            style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}
+          >
+            <Search size={16} style={{ color: 'var(--txt3)' }} />
+            <input
+              type="text"
+              placeholder="Rechercher un don..."
+              value={recherche}
+              onChange={(e) => setRecherche(e.target.value)}
+              className="flex-1 outline-none bg-transparent text-sm"
+              style={{ color: 'var(--txt)' }}
+            />
+          </div>
+          <button
+            type="button"
+            className="btn-action px-5 py-3 rounded-xl font-bold text-white text-sm transition"
+          >
+            Rechercher
+          </button>
         </div>
 
         <div className="flex gap-2 mb-8 flex-wrap">

@@ -2,12 +2,29 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, X, Gift, Hammer, User, Plus } from 'lucide-react';
+import { Menu, X, Gift, Hammer, User, Plus, Search } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Header() {
   const [menuOuvert, setMenuOuvert] = useState(false);
+  const [rechercheOuverte, setRechercheOuverte] = useState(false);
+  const [requete, setRequete] = useState('');
   const { user, loading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const surPageRecherche = pathname === '/recherche';
+
+  const handleRecherche = (e) => {
+    e.preventDefault();
+  };
+
+  const handleChangeRequete = (val) => {
+    setRequete(val);
+    if (val.trim()) {
+      router.push(`/recherche?q=${encodeURIComponent(val)}`);
+    }
+  };
 
   const liens = [
     { href: '/dons', label: 'Dons', icon: Gift },
@@ -46,6 +63,15 @@ export default function Header() {
               Publier
             </Link>
           )}
+          {!surPageRecherche && (
+            <button
+              onClick={() => setRechercheOuverte(!rechercheOuverte)}
+              className="hover-contour p-2 rounded-lg transition"
+              style={{ color: 'var(--txt2)' }}
+            >
+              <Search size={18} />
+            </button>
+          )}
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
@@ -78,14 +104,40 @@ export default function Header() {
           ) : null}
         </div>
 
-        <button
-          className="hover-surface rounded-lg p-1.5 md:hidden"
-          onClick={() => setMenuOuvert(!menuOuvert)}
-          style={{ color: 'var(--txt)' }}
-        >
-          {menuOuvert ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="md:hidden flex items-center gap-1">
+          {!surPageRecherche && (
+            <button
+              onClick={() => setRechercheOuverte(!rechercheOuverte)}
+              className="hover-surface rounded-lg p-1.5"
+              style={{ color: 'var(--txt)' }}
+            >
+              <Search size={20} />
+            </button>
+          )}
+          <button
+            className="hover-surface rounded-lg p-1.5"
+            onClick={() => setMenuOuvert(!menuOuvert)}
+            style={{ color: 'var(--txt)' }}
+          >
+            {menuOuvert ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
+
+      {rechercheOuverte && !surPageRecherche && (
+        <form onSubmit={handleRecherche} className="px-4 pb-4 flex items-center gap-2 border-t pt-3" style={{ borderColor: 'var(--bd)' }}>
+          <Search size={16} style={{ color: 'var(--txt3)' }} />
+          <input
+            type="text"
+            placeholder="Rechercher un don ou une enchère..."
+            value={requete}
+            onChange={(e) => handleChangeRequete(e.target.value)}
+            className="flex-1 outline-none bg-transparent text-sm"
+            style={{ color: 'var(--txt)' }}
+            autoFocus
+          />
+        </form>
+      )}
 
       {menuOuvert && (
         <div className="md:hidden border-t px-4 py-4 flex flex-col gap-3" style={{ borderColor: 'var(--bd)' }}>
