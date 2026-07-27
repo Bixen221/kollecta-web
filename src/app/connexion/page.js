@@ -4,20 +4,29 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import SelecteurPays from '@/components/SelecteurPays';
+import { paysParDefaut } from '@/data/pays';
 
 export default function ConnexionPage() {
   const { connexion } = useAuth();
   const router = useRouter();
-  const [whatsapp, setWhatsapp] = useState('');
+  const [pays, setPays] = useState(paysParDefaut);
+  const [numeroLocal, setNumeroLocal] = useState('');
   const [password, setPassword] = useState('');
   const [erreur,   setErreur]   = useState('');
   const [loading,  setLoading]  = useState(false);
+
+  const handleNumeroChange = (val) => {
+    const chiffres = val.replace(/\D/g, '').slice(0, pays.longueur);
+    setNumeroLocal(chiffres);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErreur('');
     setLoading(true);
     try {
+      const whatsapp = pays.indicatif + numeroLocal;
       await connexion(whatsapp, password);
       router.push('/');
     } catch (err) {
@@ -54,15 +63,18 @@ export default function ConnexionPage() {
             <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>
               Numéro WhatsApp
             </label>
-            <input
-              type="tel"
-              placeholder="771234567"
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-              required
-              className="w-full px-4 py-3 rounded-lg border outline-none focus:ring-2"
-              style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
-            />
+            <div className="flex gap-2">
+              <SelecteurPays paysSelectionne={pays} onChange={(p) => { setPays(p); setNumeroLocal(''); }} />
+              <input
+                type="tel"
+                placeholder={'X'.repeat(pays.longueur)}
+                value={numeroLocal}
+                onChange={(e) => handleNumeroChange(e.target.value)}
+                required
+                className="flex-1 min-w-0 px-4 py-3 rounded-lg border outline-none focus:ring-2"
+                style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+              />
+            </div>
           </div>
 
           <div>
