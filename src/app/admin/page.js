@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, TrendingUp, Users, Gift, Hammer, Star, ShieldAlert } from 'lucide-react';
+import { LogOut, TrendingUp, Users, Gift, Hammer, Star, ShieldAlert, ImageOff, Trash2, ShieldCheck } from 'lucide-react';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 
@@ -12,10 +12,39 @@ export default function AdminPage() {
   const [stats,   setStats]   = useState(null);
   const [loading, setLoading] = useState(true);
   const [erreur,  setErreur]  = useState('');
+  const [annoncesSansPhoto, setAnnoncesSansPhoto] = useState([]);
+  const [usersNonVerifies, setUsersNonVerifies] = useState([]);
 
   useEffect(() => {
     if (!authLoading && (!user || !user.est_admin)) router.push('/');
   }, [authLoading, user]);
+
+  const chargerAnnoncesSansPhoto = async () => {
+    try {
+      const res = await api.get('/admin/annonces-sans-photo');
+      setAnnoncesSansPhoto(res.annonces || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const chargerUsersNonVerifies = async () => {
+    try {
+      const res = await api.get('/admin/users');
+      setUsersNonVerifies((res.users || []).filter(u => !u.verifie));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const verifierUser = async (u) => {
+    try {
+      await api.put(`/admin/users/${u.id}/verifier`, { verifie: true });
+      chargerUsersNonVerifies();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   useEffect(() => {
     const charger = async () => {
@@ -28,8 +57,19 @@ export default function AdminPage() {
         setLoading(false);
       }
     };
-    if (user?.est_admin) charger();
+    if (user?.est_admin) { charger(); chargerAnnoncesSansPhoto(); chargerUsersNonVerifies(); }
   }, [user]);
+
+  const supprimerAnnonce = async (annonce) => {
+    if (!confirm(`Supprimer "${annonce.titre}" ? Cette action est irréversible.`)) return;
+    try {
+      const endpoint = annonce.categorie_annonce === 'don' ? 'dons' : 'encheres';
+      await api.delete(`/admin/${endpoint}/${annonce.id}`);
+      chargerAnnoncesSansPhoto();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   if (authLoading || !user || !user.est_admin) return null;
 
@@ -121,7 +161,7 @@ export default function AdminPage() {
 
             {/* MODERATION */}
             <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: 'var(--txt3)' }}>Modération</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
               <KpiCard
                 icon={ShieldAlert}
                 label="Utilisateurs non vérifiés"
@@ -129,7 +169,83 @@ export default function AdminPage() {
                 couleur={stats.users_non_verifies > 0 ? 'var(--bord)' : 'var(--gr)'}
                 sous="À examiner en priorité"
               />
+              <KpiCard
+                icon={ImageOff}
+                label="Annonces sans photo"
+                value={annoncesSansPhoto.length}
+                couleur={annoncesSansPhoto.length > 0 ? 'var(--bord)' : 'var(--gr)'}
+                sous="À compléter ou supprimer"
+              />
             </div>
+
+            {/* LISTE UTILISATEURS NON VERIFIES */}
+            {usersNonVerifies.length > 0 && (
+              <div className="mb-8">
+                <p className="text-xs font-bold uppercase tracking-wide mb-3 flex items-center gap-2" style={{ color: 'var(--txt3)' }}>
+                  <ShieldCheck size={13} /> Utilisateurs non vérifiés ({usersNonVerifies.length})
+                </p>
+                <div className="flex flex-col gap-2">
+                  {usersNonVerifies.map((u) => (
+                    <div
+                      key={u.id}
+                      className="rounded-xl border p-4 flex items-center gap-4"
+                      style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}
+                    >
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style={{ backgroundColor: 'var(--bord)' }}>
+                        {u.prenom?.[0]}{u.nom?.[0]}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold" style={{ color: 'var(--txt)' }}>{u.prenom} {u.nom}</p>
+                        <p className="text-xs" style={{ color: 'var(--txt2)' }}>{u.whatsapp} · {u.quartier}, {u.ville}</p>
+                        <p className="text-xs" style={{ color: 'var(--txt3)' }}>{u.nb_dons} dons · ⭐ {u.note_moyenne}</p>
+                      </div>
+                      <button
+                        onClick={() => verifierUser(u)}
+                        className="hover-surface flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border flex-shrink-0"
+                        style={{ borderColor: 'var(--gr)', color: 'var(--gr)' }}
+                      >
+                        <ShieldCheck size={14} /> Vérifier
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* LISTE ANNONCES SANS PHOTO */}
+            {annoncesSansPhoto.length > 0 && (
+              <>
+                <p className="text-xs font-bold uppercase tracking-wide mb-3 flex items-center gap-2" style={{ color: 'var(--txt3)' }}>
+                  <ImageOff size={13} /> Annonces sans photo ({annoncesSansPhoto.length})
+                </p>
+                <div className="flex flex-col gap-2">
+                  {annoncesSansPhoto.map((annonce) => (
+                    <div
+                      key={annonce.id}
+                      className="rounded-xl border p-4 flex items-center gap-4"
+                      style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}
+                    >
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--bordl)' }}>
+                        <ImageOff size={16} style={{ color: 'var(--bord)' }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold" style={{ color: 'var(--txt)' }}>{annonce.titre}</p>
+                        <p className="text-xs" style={{ color: 'var(--txt2)' }}>
+                          {annonce.categorie_annonce === 'don' ? '🎁 Don' : '🔨 Enchère'} · {annonce.prenom} {annonce.nom} · {new Date(annonce.cree_le).toLocaleDateString('fr-SN')}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => supprimerAnnonce(annonce)}
+                        className="hover-surface p-2 rounded-lg border flex-shrink-0"
+                        style={{ borderColor: '#FFCDD2' }}
+                      >
+                        <Trash2 size={16} style={{ color: '#CC2222' }} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </>
         )}
       </div>
