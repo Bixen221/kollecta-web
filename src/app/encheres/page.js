@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '@/services/api';
 
 const getTempsRestant = (fin_le) => {
@@ -26,8 +26,12 @@ export default function EncheresPage() {
   const [prixMax,   setPrixMax]   = useState('');
   const [ville,     setVille]     = useState('');
   const [tri,       setTri]       = useState('recent');
+  const [page,      setPage]      = useState(1);
+  const parPage = 12;
 
   const filtres = ['Tout', 'En cours', 'À venir', 'Terminées'];
+
+  useEffect(() => { setPage(1); }, [filtre, recherche, prixMin, prixMax, ville, tri]);
 
   useEffect(() => {
     const charger = async () => {
@@ -72,6 +76,9 @@ export default function EncheresPage() {
     if (tri === 'prix_desc')    return b.offre_actuelle - a.offre_actuelle;
     return 0;
   });
+
+  const totalPages = Math.max(1, Math.ceil(encheresFiltrees.length / parPage));
+  const encheresPage = encheresFiltrees.slice((page - 1) * parPage, page * parPage);
 
   const reinitialiserFiltres = () => {
     setPrixMin(''); setPrixMax(''); setVille(''); setTri('recent');
@@ -204,7 +211,7 @@ export default function EncheresPage() {
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {encheresFiltrees.map((e) => (
+            {encheresPage.map((e) => (
               <Link
                 key={e.id}
                 href={`/encheres/${e.id}`}
@@ -244,6 +251,30 @@ export default function EncheresPage() {
                 </div>
               </Link>
             ))}
+          </div>
+        )}
+
+        {!loading && encheresFiltrees.length > parPage && (
+          <div className="flex items-center justify-center gap-3 mt-10">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="hover-surface flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-semibold disabled:opacity-40 transition"
+              style={{ borderColor: 'var(--bd)', color: 'var(--txt2)' }}
+            >
+              <ChevronLeft size={16} /> Précédent
+            </button>
+            <span className="text-sm font-semibold" style={{ color: 'var(--txt2)' }}>
+              Page {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="hover-surface flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-semibold disabled:opacity-40 transition"
+              style={{ borderColor: 'var(--bd)', color: 'var(--txt2)' }}
+            >
+              Suivant <ChevronRight size={16} />
+            </button>
           </div>
         )}
       </div>

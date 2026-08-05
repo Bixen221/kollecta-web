@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '@/services/api';
 import { useReservations } from '@/context/ReservationsContext';
 
@@ -11,6 +11,8 @@ export default function DonsPage() {
   const [loading,    setLoading]    = useState(true);
   const [filtre,     setFiltre]     = useState('Tout');
   const [recherche,  setRecherche]  = useState('');
+  const [page,       setPage]       = useState(1);
+  const parPage = 12;
   const { estReserve, getReservation, charger: rechargerResas } = useReservations();
 
   const filtres = ['Tout', 'Nourriture', 'Matériels', 'Urgent'];
@@ -53,6 +55,9 @@ export default function DonsPage() {
     d.quartier?.toLowerCase().includes(recherche.toLowerCase()) ||
     d.categorie?.toLowerCase().includes(recherche.toLowerCase())
   );
+
+  const totalPages = Math.max(1, Math.ceil(donsFiltres.length / parPage));
+  const donsPage = donsFiltres.slice((page - 1) * parPage, page * parPage);
 
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: 'calc(100vh - 73px)' }}>
@@ -108,7 +113,7 @@ export default function DonsPage() {
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {donsFiltres.map((don) => {
+            {donsPage.map((don) => {
               const reserve = estReserve(don.id);
               return (
                 <Link
@@ -160,6 +165,30 @@ export default function DonsPage() {
                 </Link>
               );
             })}
+          </div>
+        )}
+
+        {!loading && donsFiltres.length > parPage && (
+          <div className="flex items-center justify-center gap-3 mt-10">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="hover-surface flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-semibold disabled:opacity-40 transition"
+              style={{ borderColor: 'var(--bd)', color: 'var(--txt2)' }}
+            >
+              <ChevronLeft size={16} /> Précédent
+            </button>
+            <span className="text-sm font-semibold" style={{ color: 'var(--txt2)' }}>
+              Page {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="hover-surface flex items-center gap-1 px-3 py-2 rounded-lg border text-sm font-semibold disabled:opacity-40 transition"
+              style={{ borderColor: 'var(--bd)', color: 'var(--txt2)' }}
+            >
+              Suivant <ChevronRight size={16} />
+            </button>
           </div>
         )}
       </div>
