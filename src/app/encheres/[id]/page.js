@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, MapPin, Star, ChevronRight } from 'lucide-react';
+import BoutonPartager from '@/components/BoutonPartager';
 import { io } from 'socket.io-client';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
@@ -123,9 +124,12 @@ export default function DetailEncherePage() {
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: 'calc(100vh - 73px)' }}>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        <Link href="/encheres" className="inline-flex items-center gap-2 text-sm font-semibold mb-6 hover:opacity-70" style={{ color: 'var(--txt2)' }}>
-          <ArrowLeft size={16} /> Retour aux enchères
-        </Link>
+        <div className="flex items-center justify-between mb-6">
+          <Link href="/encheres" className="inline-flex items-center gap-2 text-sm font-semibold hover:opacity-70" style={{ color: 'var(--txt2)' }}>
+            <ArrowLeft size={16} /> Retour aux enchères
+          </Link>
+          <BoutonPartager titre={enchere?.titre} texte={`Découvrez cette enchère sur Kollecta : ${enchere?.titre}`} />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>

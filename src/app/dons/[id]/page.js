@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, MapPin, Star, ChevronRight } from 'lucide-react';
+import BoutonPartager from '@/components/BoutonPartager';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 import { useReservations } from '@/context/ReservationsContext';
@@ -80,9 +81,12 @@ export default function DetailDonPage() {
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: 'calc(100vh - 73px)' }}>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        <Link href="/dons" className="inline-flex items-center gap-2 text-sm font-semibold mb-6 hover:opacity-70" style={{ color: 'var(--txt2)' }}>
-          <ArrowLeft size={16} /> Retour aux dons
-        </Link>
+        <div className="flex items-center justify-between mb-6">
+          <Link href="/dons" className="inline-flex items-center gap-2 text-sm font-semibold hover:opacity-70" style={{ color: 'var(--txt2)' }}>
+            <ArrowLeft size={16} /> Retour aux dons
+          </Link>
+          <BoutonPartager titre={don?.titre} texte={`Découvrez ce don sur Kollecta : ${don?.titre}`} />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
