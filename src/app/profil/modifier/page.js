@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Camera } from 'lucide-react';
 import api from '@/services/api';
+import { compresserImage } from '@/utils/compresserImage';
 import { useAuth } from '@/context/AuthContext';
 import SelecteurPays from '@/components/SelecteurPays';
 import { PAYS, paysParDefaut } from '@/data/pays';
@@ -68,8 +69,9 @@ export default function ModifierProfilPage() {
     try {
       if (avatarFile) {
         const token = localStorage.getItem('kollecta_token');
+        const avatarCompresse = await compresserImage(avatarFile, 500, 0.8);
         const formData = new FormData();
-        formData.append('photo', avatarFile);
+        formData.append('photo', avatarCompresse);
         formData.append('entite_type', 'avatar');
         formData.append('entite_id', user.id);
         formData.append('ordre', '0');

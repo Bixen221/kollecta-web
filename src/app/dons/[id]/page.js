@@ -16,6 +16,7 @@ export default function DetailDonPage() {
   const [don,     setDon]     = useState(null);
   const [loading, setLoading] = useState(true);
   const [photoActive, setPhotoActive] = useState(0);
+  const [zoomOuvert, setZoomOuvert] = useState(false);
   const [erreur, setErreur] = useState('');
 
   useEffect(() => {
@@ -86,8 +87,13 @@ export default function DetailDonPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <div
+              onClick={() => photos.length > 0 && setZoomOuvert(true)}
               className="h-80 rounded-2xl overflow-hidden flex items-center justify-center border"
-              style={{ backgroundColor: don.type === 'nourriture' ? '#FFF8E8' : '#EAF5EE', borderColor: 'var(--bd)' }}
+              style={{
+                backgroundColor: don.type === 'nourriture' ? '#FFF8E8' : '#EAF5EE',
+                borderColor: 'var(--bd)',
+                cursor: photos.length > 0 ? 'zoom-in' : 'default',
+              }}
             >
               {photos.length > 0 ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -96,6 +102,17 @@ export default function DetailDonPage() {
                 <span className="text-7xl">{don.type === 'nourriture' ? '🍱' : '📦'}</span>
               )}
             </div>
+
+            {zoomOuvert && (
+              <div
+                onClick={() => setZoomOuvert(false)}
+                className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+                style={{ backgroundColor: 'rgba(0,0,0,0.9)', cursor: 'zoom-out' }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photos[photoActive]} alt={don.titre} className="max-w-full max-h-full object-contain rounded-lg" />
+              </div>
+            )}
             {photos.length > 1 && (
               <div className="flex gap-2 mt-3">
                 {photos.map((p, i) => (

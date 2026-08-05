@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, X, Camera } from 'lucide-react';
 import api from '@/services/api';
+import { compresserImage } from '@/utils/compresserImage';
 import { useAuth } from '@/context/AuthContext';
 
 const API_URL = 'https://kollecta-backend.onrender.com/api';
@@ -66,8 +67,9 @@ export default function PublierDonPage() {
       const donId = resDon.don.id;
 
       for (let i = 0; i < photos.length; i++) {
+        const photoCompressee = await compresserImage(photos[i].file);
         const formData = new FormData();
-        formData.append('photo', photos[i].file);
+        formData.append('photo', photoCompressee);
         formData.append('entite_type', 'don');
         formData.append('entite_id', donId);
         formData.append('ordre', String(i));
