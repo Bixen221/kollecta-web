@@ -15,7 +15,7 @@
   --gr:      #2D7A4F;
   --grl:     #E8F5EE;
   --bleu:    #2563EB;
-  --bleuh:   #1D4ED8;
+  --bleuh:   #2663EB;
 }
 
 .dark {
@@ -33,7 +33,7 @@
   --gr:      #2D7A4F;
   --grl:     rgba(45,122,79,0.2);
   --bleu:    #3B82F6;
-  --bleuh:   #2563EB;
+  --bleuh:   #2663EB;
 }
 
 body {
@@ -82,4 +82,13 @@ body {
 .hover-contour:hover {
   border-color: var(--or);
   background-color: var(--orl);
+}
+
+.hover-bleu {
+  transition: all 0.15s;
+  color: var(--txt2);
+}
+.hover-bleu:hover {
+  color: var(--bleuh) !important;
+  background-color: rgba(38, 99, 235, 0.08) !important;
 }

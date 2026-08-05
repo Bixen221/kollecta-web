@@ -46,8 +46,7 @@ export default function Header() {
             <Link
               key={href}
               href={href}
-              className="hover-contour flex items-center gap-1.5 text-sm font-semibold transition px-3 py-1.5 rounded-lg"
-              style={{ color: 'var(--txt2)' }}
+              className="hover-bleu flex items-center gap-1.5 text-sm font-semibold transition px-3 py-1.5 rounded-lg"
             >
               <Icon size={16} />
               {label}
@@ -56,8 +55,7 @@ export default function Header() {
           {!loading && user && (
             <Link
               href="/publier"
-              className="hover-contour flex items-center gap-1.5 text-sm font-semibold transition px-3 py-1.5 rounded-lg"
-              style={{ color: 'var(--txt2)' }}
+              className="hover-bleu flex items-center gap-1.5 text-sm font-semibold transition px-3 py-1.5 rounded-lg"
             >
               <Plus size={16} />
               Publier

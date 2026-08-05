@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import api from '@/services/api';
 
 const getTempsRestant = (fin_le) => {
@@ -21,6 +21,11 @@ export default function EncheresPage() {
   const [loading,   setLoading]   = useState(true);
   const [filtre,    setFiltre]    = useState('Tout');
   const [recherche, setRecherche] = useState('');
+  const [filtresOuverts, setFiltresOuverts] = useState(false);
+  const [prixMin,   setPrixMin]   = useState('');
+  const [prixMax,   setPrixMax]   = useState('');
+  const [ville,     setVille]     = useState('');
+  const [tri,       setTri]       = useState('recent');
 
   const filtres = ['Tout', 'En cours', 'À venir', 'Terminées'];
 
@@ -39,7 +44,9 @@ export default function EncheresPage() {
     charger();
   }, []);
 
-  const encheresFiltres = encheres.filter(e => {
+  const villesDisponibles = [...new Set(encheres.map(e => e.ville).filter(Boolean))];
+
+  let encheresFiltrees = encheres.filter(e => {
     const correspondRecherche =
       e.titre?.toLowerCase().includes(recherche.toLowerCase()) ||
       e.quartier?.toLowerCase().includes(recherche.toLowerCase()) ||
@@ -47,11 +54,30 @@ export default function EncheresPage() {
     if (!correspondRecherche) return false;
 
     const terminee = estReellementTerminee(e);
-    if (filtre === 'En cours')  return !terminee && e.statut === 'en_cours';
-    if (filtre === 'À venir')   return e.statut === 'a_venir' && !terminee;
-    if (filtre === 'Terminées') return terminee;
+    if (filtre === 'En cours'  && (terminee || e.statut !== 'en_cours')) return false;
+    if (filtre === 'À venir'   && (terminee || e.statut !== 'a_venir')) return false;
+    if (filtre === 'Terminées' && !terminee) return false;
+
+    if (prixMin && e.offre_actuelle < parseInt(prixMin)) return false;
+    if (prixMax && e.offre_actuelle > parseInt(prixMax)) return false;
+    if (ville && e.ville !== ville) return false;
+
     return true;
   });
+
+  encheresFiltrees = [...encheresFiltrees].sort((a, b) => {
+    if (tri === 'recent')       return new Date(b.cree_le) - new Date(a.cree_le);
+    if (tri === 'ancien')       return new Date(a.cree_le) - new Date(b.cree_le);
+    if (tri === 'prix_asc')     return a.offre_actuelle - b.offre_actuelle;
+    if (tri === 'prix_desc')    return b.offre_actuelle - a.offre_actuelle;
+    return 0;
+  });
+
+  const reinitialiserFiltres = () => {
+    setPrixMin(''); setPrixMax(''); setVille(''); setTri('recent');
+  };
+
+  const filtresActifs = prixMin || prixMax || ville || tri !== 'recent';
 
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: 'calc(100vh - 73px)' }}>
@@ -59,8 +85,7 @@ export default function EncheresPage() {
         <h1 className="text-3xl font-extrabold mb-2" style={{ color: 'var(--txt)' }}>🔨 Enchères</h1>
         <p className="text-sm mb-6" style={{ color: 'var(--txt2)' }}>Misez sur les meilleures offres</p>
 
-        {/* RECHERCHE */}
-        <div className="flex items-center gap-2 mb-4 max-w-md">
+        <div className="flex items-center gap-2 mb-4 max-w-2xl">
           <div
             className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl border"
             style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}
@@ -81,15 +106,85 @@ export default function EncheresPage() {
           >
             Rechercher
           </button>
+          <button
+            type="button"
+            onClick={() => setFiltresOuverts(!filtresOuverts)}
+            className="hover-surface flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition relative"
+            style={{ borderColor: filtresActifs ? 'var(--or)' : 'var(--bd)', color: filtresActifs ? 'var(--or)' : 'var(--txt2)' }}
+          >
+            <SlidersHorizontal size={16} /> Filtres
+            {filtresActifs && (
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: 'var(--bord)' }} />
+            )}
+          </button>
         </div>
 
-        {/* FILTRES */}
+        {filtresOuverts && (
+          <div className="rounded-2xl border p-5 mb-6 max-w-2xl" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Prix minimum (FCFA)</label>
+                <input
+                  type="number" placeholder="0" value={prixMin} onChange={(e) => setPrixMin(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border outline-none text-sm"
+                  style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Prix maximum (FCFA)</label>
+                <input
+                  type="number" placeholder="Aucune limite" value={prixMax} onChange={(e) => setPrixMax(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border outline-none text-sm"
+                  style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Ville</label>
+                <select
+                  value={ville} onChange={(e) => setVille(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border outline-none text-sm"
+                  style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                >
+                  <option value="">Toutes les villes</option>
+                  {villesDisponibles.map(v => <option key={v} value={v}>{v}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Trier par</label>
+                <select
+                  value={tri} onChange={(e) => setTri(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-lg border outline-none text-sm"
+                  style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                >
+                  <option value="recent">Plus récentes</option>
+                  <option value="ancien">Plus anciennes</option>
+                  <option value="prix_asc">Prix croissant</option>
+                  <option value="prix_desc">Prix décroissant</option>
+                </select>
+              </div>
+            </div>
+
+            {filtresActifs && (
+              <button
+                onClick={reinitialiserFiltres}
+                className="text-xs font-bold hover:underline"
+                style={{ color: 'var(--bord)' }}
+              >
+                Réinitialiser les filtres
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="flex gap-2 mb-8 flex-wrap">
           {filtres.map((f) => (
             <button
               key={f}
               onClick={() => setFiltre(f)}
-              className="px-4 py-2 rounded-full text-sm font-semibold border transition"
+              className="btn-hover-fade px-4 py-2 rounded-full text-sm font-semibold border transition"
               style={{
                 backgroundColor: filtre === f ? 'var(--bord)' : 'var(--card)',
                 borderColor: filtre === f ? 'var(--bord)' : 'var(--bd)',
@@ -101,16 +196,15 @@ export default function EncheresPage() {
           ))}
         </div>
 
-        {/* LISTE */}
         {loading ? (
           <p style={{ color: 'var(--txt2)' }}>Chargement...</p>
-        ) : encheresFiltres.length === 0 ? (
+        ) : encheresFiltrees.length === 0 ? (
           <p style={{ color: 'var(--txt2)' }}>
             {recherche ? `Aucun résultat pour "${recherche}"` : 'Aucune enchère disponible.'}
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {encheresFiltres.map((e) => (
+            {encheresFiltrees.map((e) => (
               <Link
                 key={e.id}
                 href={`/encheres/${e.id}`}
