@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, TrendingUp, Users, Gift, Hammer, Star, ShieldAlert, ImageOff, Trash2, ShieldCheck } from 'lucide-react';
+import { LogOut, TrendingUp, Users, Gift, Hammer, Star, ShieldAlert, ImageOff, Trash2, ShieldCheck, Download } from 'lucide-react';
+import { exporterCsv } from '@/utils/exportCsv';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 
@@ -14,6 +15,9 @@ export default function AdminPage() {
   const [erreur,  setErreur]  = useState('');
   const [annoncesSansPhoto, setAnnoncesSansPhoto] = useState([]);
   const [usersNonVerifies, setUsersNonVerifies] = useState([]);
+  const [tousLesUsers, setTousLesUsers] = useState([]);
+  const [tousLesDons, setTousLesDons] = useState([]);
+  const [toutesLesEncheres, setToutesLesEncheres] = useState([]);
 
   useEffect(() => {
     if (!authLoading && (!user || !user.est_admin)) router.push('/');
@@ -31,10 +35,68 @@ export default function AdminPage() {
   const chargerUsersNonVerifies = async () => {
     try {
       const res = await api.get('/admin/users');
+      setTousLesUsers(res.users || []);
       setUsersNonVerifies((res.users || []).filter(u => !u.verifie));
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const chargerDonsEtEncheres = async () => {
+    try {
+      const [resDons, resEncheres] = await Promise.all([
+        api.get('/admin/dons'),
+        api.get('/admin/encheres'),
+      ]);
+      setTousLesDons(resDons.dons || []);
+      setToutesLesEncheres(resEncheres.encheres || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const exporterUsers = () => {
+    exporterCsv(tousLesUsers, [
+      { champ: 'prenom', label: 'Prénom' },
+      { champ: 'nom', label: 'Nom' },
+      { champ: 'whatsapp', label: 'WhatsApp' },
+      { champ: 'quartier', label: 'Quartier' },
+      { champ: 'ville', label: 'Ville' },
+      { champ: 'nb_dons', label: 'Dons faits' },
+      { champ: 'note_moyenne', label: 'Note moyenne' },
+      { champ: 'verifie', label: 'Vérifié' },
+      { champ: 'cree_le', label: 'Date inscription' },
+    ], `kollecta-utilisateurs-${new Date().toISOString().slice(0,10)}.csv`);
+  };
+
+  const exporterDons = () => {
+    exporterCsv(tousLesDons, [
+      { champ: 'titre', label: 'Titre' },
+      { champ: 'type', label: 'Type' },
+      { champ: 'statut', label: 'Statut' },
+      { champ: 'quartier', label: 'Quartier' },
+      { champ: 'ville', label: 'Ville' },
+      { champ: 'quantite_total', label: 'Quantité totale' },
+      { champ: 'quantite_dispo', label: 'Quantité disponible' },
+      { champ: 'prenom', label: 'Prénom propriétaire' },
+      { champ: 'nom', label: 'Nom propriétaire' },
+      { champ: 'cree_le', label: 'Date publication' },
+    ], `kollecta-dons-${new Date().toISOString().slice(0,10)}.csv`);
+  };
+
+  const exporterEncheres = () => {
+    exporterCsv(toutesLesEncheres, [
+      { champ: 'titre', label: 'Titre' },
+      { champ: 'statut', label: 'Statut' },
+      { champ: 'prix_depart', label: 'Prix de départ' },
+      { champ: 'offre_actuelle', label: 'Offre actuelle' },
+      { champ: 'nb_offres', label: 'Nombre offres' },
+      { champ: 'quartier', label: 'Quartier' },
+      { champ: 'ville', label: 'Ville' },
+      { champ: 'prenom', label: 'Prénom vendeur' },
+      { champ: 'nom', label: 'Nom vendeur' },
+      { champ: 'cree_le', label: 'Date publication' },
+    ], `kollecta-encheres-${new Date().toISOString().slice(0,10)}.csv`);
   };
 
   const verifierUser = async (u) => {
@@ -57,7 +119,7 @@ export default function AdminPage() {
         setLoading(false);
       }
     };
-    if (user?.est_admin) { charger(); chargerAnnoncesSansPhoto(); chargerUsersNonVerifies(); }
+    if (user?.est_admin) { charger(); chargerAnnoncesSansPhoto(); chargerUsersNonVerifies(); chargerDonsEtEncheres(); }
   }, [user]);
 
   const supprimerAnnonce = async (annonce) => {
@@ -104,6 +166,32 @@ export default function AdminPage() {
         {erreur && (
           <div className="mb-4 px-4 py-3 rounded-lg text-sm font-medium" style={{ backgroundColor: '#FDE8EB', color: '#8B1A2A' }}>
             {erreur}
+          </div>
+        )}
+
+        {!loading && (
+          <div className="flex gap-3 flex-wrap mb-8">
+            <button
+              onClick={exporterUsers}
+              className="hover-surface flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold border transition"
+              style={{ borderColor: 'var(--bd)', color: 'var(--txt2)' }}
+            >
+              <Download size={15} /> Exporter utilisateurs
+            </button>
+            <button
+              onClick={exporterDons}
+              className="hover-surface flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold border transition"
+              style={{ borderColor: 'var(--bd)', color: 'var(--txt2)' }}
+            >
+              <Download size={15} /> Exporter dons
+            </button>
+            <button
+              onClick={exporterEncheres}
+              className="hover-surface flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold border transition"
+              style={{ borderColor: 'var(--bd)', color: 'var(--txt2)' }}
+            >
+              <Download size={15} /> Exporter enchères
+            </button>
           </div>
         )}
 
