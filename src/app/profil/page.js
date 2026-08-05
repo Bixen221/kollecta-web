@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Star, MapPin, LogOut, Moon, Sun, Pencil, Gift, ClipboardList, Bell, MessageCircle, ShieldCheck, Hammer } from 'lucide-react';
+import { getBadgeMembre } from '@/utils/badges';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -53,6 +54,14 @@ export default function ProfilPage() {
           >
             {user.verifie ? '✅ Compte vérifié' : '⏳ Non vérifié'} · Membre Kollecta
           </span>
+          {getBadgeMembre(user) && (
+            <span
+              className="mt-2 px-3 py-1 rounded-full text-xs font-bold"
+              style={{ backgroundColor: getBadgeMembre(user).bg, color: getBadgeMembre(user).couleur }}
+            >
+              {getBadgeMembre(user).emoji} {getBadgeMembre(user).label}
+            </span>
+          )}
         </div>
 
         <div className="grid grid-cols-3 gap-3 mb-6">
