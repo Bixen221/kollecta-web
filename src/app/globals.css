@@ -92,3 +92,41 @@ body {
   color: var(--bleuh) !important;
   background-color: rgba(38, 99, 235, 0.08) !important;
 }
+
+.dark .hover-surface:hover {
+  background-color: rgba(201, 168, 76, 0.12) !important;
+}
+
+.dark .hover-contour:hover {
+  border-color: var(--or) !important;
+  background-color: rgba(201, 168, 76, 0.15) !important;
+}
+
+.dark .btn-hover-fade:hover {
+  background-color: #FFFFFF !important;
+  color: #0E0A08 !important;
+  filter: none !important;
+}
+
+.dark .hover-bleu:hover {
+  color: #FFFFFF !important;
+}
+
+.dark .btn-action:hover {
+  filter: brightness(1.15);
+}
+
+.dark .btn-hover-fade.btn-blanc-hover:hover {
+  color: #FFFFFF !important;
+}
+
+.dark .btn-action:hover {
+  background-color: #FFFFFF !important;
+  color: #0E0A08 !important;
+  filter: none;
+}
+
+.dark .btn-deconnexion:hover {
+  background-color: #FFFFFF !important;
+  color: #0E0A08 !important;
+}
