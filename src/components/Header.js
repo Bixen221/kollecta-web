@@ -2,18 +2,35 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, X, Gift, Hammer, User, Plus, Search } from 'lucide-react';
+import { Menu, X, Gift, Hammer, User, Plus, Search, Bell } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useState as useStateReact, useEffect } from 'react';
+import api from '@/services/api';
 
 export default function Header() {
   const [menuOuvert, setMenuOuvert] = useState(false);
   const [rechercheOuverte, setRechercheOuverte] = useState(false);
   const [requete, setRequete] = useState('');
+  const [notifsNonLues, setNotifsNonLues] = useStateReact(0);
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const surPageRecherche = pathname === '/recherche';
+
+  useEffect(() => {
+    if (!user) { setNotifsNonLues(0); return; }
+    const charger = async () => {
+      try {
+        const res = await api.get('/notifications');
+        const nonLues = (res.notifications || []).filter(n => !n.lu).length;
+        setNotifsNonLues(nonLues);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    charger();
+  }, [user]);
 
   const handleRecherche = (e) => {
     e.preventDefault();
@@ -73,6 +90,23 @@ export default function Header() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
+          {!loading && user && (
+            <Link
+              href="/profil/notifications"
+              className="hover-surface relative p-2 rounded-lg transition"
+              style={{ color: 'var(--txt2)' }}
+            >
+              <Bell size={18} />
+              {notifsNonLues > 0 && (
+                <span
+                  className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
+                  style={{ backgroundColor: 'var(--bord)' }}
+                >
+                  {notifsNonLues > 9 ? '9+' : notifsNonLues}
+                </span>
+              )}
+            </Link>
+          )}
           {!loading && user ? (
             <Link
               href="/profil"

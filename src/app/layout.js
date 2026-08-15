@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ReservationsProvider } from "@/context/ReservationsContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const metadata = {
   metadataBase: new URL('https://kollecta-web-teal.vercel.app'),
@@ -36,14 +37,16 @@ export default function RootLayout({ children }) {
   return (
     <html lang="fr">
       <body className="antialiased">
-        <ThemeProvider>
-          <AuthProvider>
-            <ReservationsProvider>
-              <Header />
-              {children}
-            </ReservationsProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <GoogleOAuthProvider clientId="683213095101-nml5nlgedrhufdh7hqeiasepl0o01qdp.apps.googleusercontent.com">
+          <ThemeProvider>
+            <AuthProvider>
+              <ReservationsProvider>
+                <Header />
+                {children}
+              </ReservationsProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );
