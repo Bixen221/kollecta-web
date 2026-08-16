@@ -30,7 +30,9 @@ export default function Header() {
       }
     };
     charger();
-  }, [user]);
+    const interval = setInterval(charger, 30000);
+    return () => clearInterval(interval);
+  }, [user, pathname]);
 
   const handleRecherche = (e) => {
     e.preventDefault();
