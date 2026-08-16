@@ -76,6 +76,12 @@ export default function NotificationsPage() {
 
   if (authLoading || !user) return null;
 
+  const naviguerVersEntite = (notif) => {
+    if (!notif.entite_type || !notif.entite_id) return;
+    if (notif.entite_type === 'don') router.push(`/dons/${notif.entite_id}`);
+    if (notif.entite_type === 'enchere') router.push(`/encheres/${notif.entite_id}`);
+  };
+
   const NotifCard = ({ notif, onClick }) => {
     const type = TYPES_NOTIF[notif.type] || { ico: '🔔', bg: '#F0F0F0' };
     return (
@@ -139,7 +145,7 @@ export default function NotificationsPage() {
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: 'var(--txt3)' }}>Nouvelles</p>
                 <div className="flex flex-col gap-2">
-                  {nonLues.map(n => <NotifCard key={n.id} notif={n} onClick={() => marquerLu(n.id)} />)}
+                  {nonLues.map(n => <NotifCard key={n.id} notif={n} onClick={() => { marquerLu(n.id); naviguerVersEntite(n); }} />)}
                 </div>
               </div>
             )}
@@ -147,7 +153,7 @@ export default function NotificationsPage() {
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: 'var(--txt3)' }}>Précédentes</p>
                 <div className="flex flex-col gap-2">
-                  {lues.map(n => <NotifCard key={n.id} notif={n} onClick={() => {}} />)}
+                  {lues.map(n => <NotifCard key={n.id} notif={n} onClick={() => naviguerVersEntite(n)} />)}
                 </div>
               </div>
             )}
