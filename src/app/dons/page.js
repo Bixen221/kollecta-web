@@ -65,9 +65,9 @@ export default function DonsPage() {
         <h1 className="text-3xl font-extrabold mb-2" style={{ color: 'var(--txt)' }}>🎁 Dons</h1>
         <p className="text-sm mb-6" style={{ color: 'var(--txt2)' }}>Trouvez un don près de chez vous</p>
 
-        <div className="flex items-center gap-2 mb-4 max-w-md">
+        <div className="flex items-center gap-2 mb-4 w-full sm:max-w-md">
           <div
-            className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl border"
+            className="flex-1 min-w-0 flex items-center gap-2 px-4 py-3 rounded-xl border"
             style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}
           >
             <Search size={16} style={{ color: 'var(--txt3)' }} />
@@ -76,15 +76,16 @@ export default function DonsPage() {
               placeholder="Rechercher un don..."
               value={recherche}
               onChange={(e) => setRecherche(e.target.value)}
-              className="flex-1 outline-none bg-transparent text-sm"
+              className="flex-1 min-w-0 outline-none bg-transparent text-sm"
               style={{ color: 'var(--txt)' }}
             />
           </div>
           <button
             type="button"
-            className="btn-action px-5 py-3 rounded-xl font-bold text-white text-sm transition"
+            className="btn-action shrink-0 px-3 sm:px-5 py-3 rounded-xl font-bold text-white text-sm transition flex items-center gap-2"
           >
-            Rechercher
+            <Search size={16} className="sm:hidden" />
+            <span className="hidden sm:inline">Rechercher</span>
           </button>
         </div>
 
@@ -112,7 +113,7 @@ export default function DonsPage() {
             {recherche ? `Aucun résultat pour "${recherche}"` : 'Aucun don disponible.'}
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             {donsPage.map((don) => {
               const reserve = estReserve(don.id);
               return (

@@ -92,9 +92,9 @@ export default function EncheresPage() {
         <h1 className="text-3xl font-extrabold mb-2" style={{ color: 'var(--txt)' }}>🔨 Enchères</h1>
         <p className="text-sm mb-6" style={{ color: 'var(--txt2)' }}>Misez sur les meilleures offres</p>
 
-        <div className="flex items-center gap-2 mb-4 max-w-2xl">
+        <div className="flex items-center gap-2 mb-4 flex-wrap w-full sm:max-w-2xl sm:flex-nowrap">
           <div
-            className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl border"
+            className="flex-1 min-w-[140px] flex items-center gap-2 px-4 py-3 rounded-xl border"
             style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}
           >
             <Search size={16} style={{ color: 'var(--txt3)' }} />
@@ -103,23 +103,24 @@ export default function EncheresPage() {
               placeholder="Rechercher une enchère..."
               value={recherche}
               onChange={(e) => setRecherche(e.target.value)}
-              className="flex-1 outline-none bg-transparent text-sm"
+              className="flex-1 min-w-0 outline-none bg-transparent text-sm"
               style={{ color: 'var(--txt)' }}
             />
           </div>
           <button
             type="button"
-            className="btn-action px-5 py-3 rounded-xl font-bold text-white text-sm transition"
+            className="btn-action shrink-0 px-3 sm:px-5 py-3 rounded-xl font-bold text-white text-sm transition flex items-center gap-2"
           >
-            Rechercher
+            <Search size={16} className="sm:hidden" />
+            <span className="hidden sm:inline">Rechercher</span>
           </button>
           <button
             type="button"
             onClick={() => setFiltresOuverts(!filtresOuverts)}
-            className="hover-surface flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition relative"
+            className="hover-surface shrink-0 flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl border text-sm font-bold transition relative"
             style={{ borderColor: filtresActifs ? 'var(--or)' : 'var(--bd)', color: filtresActifs ? 'var(--or)' : 'var(--txt2)' }}
           >
-            <SlidersHorizontal size={16} /> Filtres
+            <SlidersHorizontal size={16} /> <span className="hidden sm:inline">Filtres</span>
             {filtresActifs && (
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: 'var(--bord)' }} />
             )}
@@ -210,7 +211,7 @@ export default function EncheresPage() {
             {recherche ? `Aucun résultat pour "${recherche}"` : 'Aucune enchère disponible.'}
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             {encheresPage.map((e) => (
               <Link
                 key={e.id}
