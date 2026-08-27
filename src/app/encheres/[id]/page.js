@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, Star, ChevronRight } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, ChevronRight, MessageCircle } from 'lucide-react';
 import BoutonPartager from '@/components/BoutonPartager';
 import { io } from 'socket.io-client';
 import api from '@/services/api';
@@ -96,6 +96,17 @@ export default function DetailEncherePage() {
       setErreur(err.message);
     } finally {
       setPlacing(false);
+    }
+  };
+
+  const handleContacter = async () => {
+    if (!user) return router.push('/connexion');
+    setErreur('');
+    try {
+      const res = await api.post('/messages/demarrer', { entite_type: 'enchere', entite_id: id });
+      router.push(`/messages/${res.conversation.id}`);
+    } catch (err) {
+      setErreur(err.message);
     }
   };
 
@@ -252,6 +263,21 @@ export default function DetailEncherePage() {
             {estVendeur && (
               <div className="px-4 py-4 rounded-xl text-sm font-semibold text-center" style={{ backgroundColor: 'var(--card2)', color: 'var(--txt2)' }}>
                 Ceci est votre enchère
+              </div>
+            )}
+
+            {!estVendeur && estTerminee && estGagnant && (
+              <div className="flex flex-col gap-3">
+                <div className="px-4 py-4 rounded-xl text-sm font-semibold text-center" style={{ backgroundColor: 'var(--orl)', color: 'var(--or)' }}>
+                  🏆 Félicitations, vous avez remporté cette enchère !
+                </div>
+                <button
+                  onClick={handleContacter}
+                  className="w-full py-3 rounded-xl font-bold border flex items-center justify-center gap-2 hover-surface transition"
+                  style={{ borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                >
+                  <MessageCircle size={18} /> Contacter le vendeur
+                </button>
               </div>
             )}
           </div>

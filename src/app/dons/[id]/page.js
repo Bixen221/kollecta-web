@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, Star, ChevronRight } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, ChevronRight, MessageCircle } from 'lucide-react';
 import BoutonPartager from '@/components/BoutonPartager';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
@@ -52,6 +52,17 @@ export default function DetailDonPage() {
     try {
       await api.post(`/dons/reservations/${resa.id}/confirmer`, { role: 'annuler' });
       await rechargerResas();
+    } catch (err) {
+      setErreur(err.message);
+    }
+  };
+
+  const handleContacter = async () => {
+    if (!user) return router.push('/connexion');
+    setErreur('');
+    try {
+      const res = await api.post('/messages/demarrer', { entite_type: 'don', entite_id: id });
+      router.push(`/messages/${res.conversation.id}`);
     } catch (err) {
       setErreur(err.message);
     }
@@ -187,6 +198,16 @@ export default function DetailDonPage() {
               <div className="mb-4 px-4 py-3 rounded-lg text-sm font-medium" style={{ backgroundColor: '#FDE8EB', color: '#8B1A2A' }}>
                 {erreur}
               </div>
+            )}
+
+            {!estProprio && (
+              <button
+                onClick={handleContacter}
+                className="w-full mb-3 py-3 rounded-xl font-bold border flex items-center justify-center gap-2 hover-surface transition"
+                style={{ borderColor: 'var(--bd)', color: 'var(--txt)' }}
+              >
+                <MessageCircle size={18} /> Contacter le propriétaire
+              </button>
             )}
 
             {estProprio ? (
