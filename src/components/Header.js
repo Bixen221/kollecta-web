@@ -61,16 +61,20 @@ export default function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          {liens.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className="hover-bleu flex items-center gap-1.5 text-sm font-semibold transition px-3 py-1.5 rounded-lg"
-            >
-              <Icon size={16} />
-              {label}
-            </Link>
-          ))}
+          {liens.map(({ href, label, icon: Icon }) => {
+            const actif = pathname === href || pathname.startsWith(href + '/');
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`${actif ? '' : 'hover-bleu'} flex items-center gap-1.5 text-sm font-semibold transition px-3 py-1.5 rounded-lg`}
+                style={actif ? { color: 'var(--or)', backgroundColor: 'var(--orl)' } : undefined}
+              >
+                <Icon size={16} />
+                {label}
+              </Link>
+            );
+          })}
           {!loading && user && (
             <Link
               href="/publier"
@@ -175,18 +179,21 @@ export default function Header() {
 
       {menuOuvert && (
         <div className="md:hidden border-t px-4 py-4 flex flex-col gap-3" style={{ borderColor: 'var(--bd)' }}>
-          {liens.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setMenuOuvert(false)}
-              className="hover-contour flex items-center gap-2 text-sm font-semibold py-2 px-2 rounded-lg"
-              style={{ color: 'var(--txt2)' }}
-            >
-              <Icon size={18} />
-              {label}
-            </Link>
-          ))}
+          {liens.map(({ href, label, icon: Icon }) => {
+            const actif = pathname === href || pathname.startsWith(href + '/');
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setMenuOuvert(false)}
+                className={`${actif ? '' : 'hover-contour'} flex items-center gap-2 text-sm font-semibold py-2 px-2 rounded-lg`}
+                style={actif ? { color: 'var(--or)', backgroundColor: 'var(--orl)' } : { color: 'var(--txt2)' }}
+              >
+                <Icon size={18} />
+                {label}
+              </Link>
+            );
+          })}
           {!loading && user && (
             <Link
               href="/publier"
