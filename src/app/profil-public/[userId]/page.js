@@ -14,6 +14,8 @@ export default function ProfilPublicPage() {
 
   const [evaluations, setEvaluations] = useState([]);
   const [loading,     setLoading]     = useState(true);
+  const [dons,        setDons]        = useState([]);
+  const [encheres,    setEncheres]    = useState([]);
 
   useEffect(() => {
     const charger = async () => {
@@ -27,6 +29,20 @@ export default function ProfilPublicPage() {
       }
     };
     charger();
+
+    const chargerAnnonces = async () => {
+      try {
+        const [resDons, resEncheres] = await Promise.all([
+          api.get('/dons', { params: { proprietaire_id: userId } }),
+          api.get('/encheres', { params: { vendeur_id: userId } }),
+        ]);
+        setDons(resDons.dons || []);
+        setEncheres(resEncheres.encheres || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    chargerAnnonces();
   }, [userId]);
 
   const noteMoyenne = evaluations.length > 0
@@ -124,6 +140,71 @@ export default function ProfilPublicPage() {
               </div>
             )}
           </>
+        )}
+
+        {(dons.length > 0 || encheres.length > 0) && (
+          <div className="mt-8">
+            <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: 'var(--txt3)' }}>
+              Autres annonces ({dons.length + encheres.length})
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {dons.map((don) => (
+                <Link
+                  key={`don-${don.id}`}
+                  href={`/dons/${don.id}`}
+                  className="rounded-xl overflow-hidden border hover:shadow-lg transition block"
+                  style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}
+                >
+                  <div
+                    className="h-24 flex items-center justify-center relative"
+                    style={{ backgroundColor: don.type === 'nourriture' ? '#FFF8E8' : '#EAF5EE' }}
+                  >
+                    {don.photos?.[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={don.photos[0]} alt={don.titre} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-3xl">{don.type === 'nourriture' ? '🍱' : '📦'}</span>
+                    )}
+                    <span
+                      className="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                      style={{ backgroundColor: 'var(--orl)', color: 'var(--or)' }}
+                    >
+                      Don
+                    </span>
+                  </div>
+                  <div className="p-2.5">
+                    <p className="text-xs font-bold truncate" style={{ color: 'var(--txt)' }}>{don.titre}</p>
+                  </div>
+                </Link>
+              ))}
+              {encheres.map((enchere) => (
+                <Link
+                  key={`enchere-${enchere.id}`}
+                  href={`/encheres/${enchere.id}`}
+                  className="rounded-xl overflow-hidden border hover:shadow-lg transition block"
+                  style={{ backgroundColor: 'var(--card)', borderColor: 'var(--bd)' }}
+                >
+                  <div className="h-24 flex items-center justify-center relative" style={{ backgroundColor: 'var(--card2)' }}>
+                    {enchere.photos?.[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={enchere.photos[0]} alt={enchere.titre} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-3xl">📦</span>
+                    )}
+                    <span
+                      className="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white"
+                      style={{ backgroundColor: 'var(--bord)' }}
+                    >
+                      Enchère
+                    </span>
+                  </div>
+                  <div className="p-2.5">
+                    <p className="text-xs font-bold truncate" style={{ color: 'var(--txt)' }}>{enchere.titre}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </main>
