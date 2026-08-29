@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, MessageCircleMore } from 'lucide-react';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 
@@ -22,6 +22,7 @@ export default function ConversationPage() {
       const res = await api.get(`/messages/conversations/${id}`);
       setMessages(res.messages || []);
       setConversation(res.conversation);
+      console.log('DEBUG conversation:', res.conversation);
     } catch (err) {
       console.error(err);
     } finally {
@@ -67,16 +68,31 @@ export default function ConversationPage() {
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: 'calc(100vh - 73px)' }} className="flex flex-col">
       <div className="max-w-2xl w-full mx-auto px-4 sm:px-6 py-4 flex items-center gap-3 border-b" style={{ borderColor: 'var(--bd)' }}>
-        <button onClick={() => router.back()} className="hover-surface p-2 rounded-lg">
+        <button onClick={() => router.back()} className="hover-surface p-2 rounded-lg shrink-0">
           <ArrowLeft size={20} style={{ color: 'var(--txt)' }} />
         </button>
-        <h2 className="font-bold" style={{ color: 'var(--txt)' }}>
-          {conversation && user && (
-            conversation.proprietaire_id === user.id
-              ? `Conversation`
-              : `Conversation`
+        <div className="flex-1 min-w-0">
+          <h2 className="font-bold truncate" style={{ color: 'var(--txt)' }}>
+            {conversation?.autre_prenom} {conversation?.autre_nom}
+          </h2>
+          {conversation?.entite_titre && (
+            <p className="text-xs truncate" style={{ color: 'var(--or)' }}>
+              {conversation.entite_type === 'don' ? '🎁' : '🔨'} {conversation.entite_titre}
+              {conversation.entite_numero && ` · ID: #${String(conversation.entite_numero).padStart(5, '0')}`}
+            </p>
           )}
-        </h2>
+        </div>
+        {conversation?.autre_whatsapp && (
+            <a
+            href={`https://wa.me/${conversation.autre_whatsapp.replace('+', '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-white shrink-0 transition hover:opacity-90"
+            style={{ backgroundColor: '#25D366' }}
+          >
+            <MessageCircleMore size={15} /> <span className="hidden sm:inline">WhatsApp</span>
+          </a>
+        )}
       </div>
 
       <div className="flex-1 max-w-2xl w-full mx-auto px-4 sm:px-6 py-6 flex flex-col gap-3 overflow-y-auto">

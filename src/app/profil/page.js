@@ -112,7 +112,7 @@ export default function ProfilPage() {
           </Link>
 
           <Link
-            href="/profil/messages"
+            href="/messages"
             className="hover-surface w-full flex items-center gap-3 p-4 border-b transition"
             style={{ borderColor: 'var(--bd)' }}
           >

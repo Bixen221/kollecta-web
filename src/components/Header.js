@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Menu, X, Gift, Hammer, User, Plus, Search, Bell } from 'lucide-react';
+import { Menu, X, Gift, Hammer, User, Plus, Search, Bell, MessageCircle } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useState as useStateReact, useEffect } from 'react';
@@ -13,18 +13,26 @@ export default function Header() {
   const [rechercheOuverte, setRechercheOuverte] = useState(false);
   const [requete, setRequete] = useState('');
   const [notifsNonLues, setNotifsNonLues] = useStateReact(0);
+  const [messagesNonLus, setMessagesNonLus] = useStateReact(0);
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const surPageRecherche = pathname === '/recherche';
 
   useEffect(() => {
-    if (!user) { setNotifsNonLues(0); return; }
+    if (!user) { setNotifsNonLues(0); setMessagesNonLus(0); return; }
     const charger = async () => {
       try {
         const res = await api.get('/notifications');
         const nonLues = (res.notifications || []).filter(n => !n.lu).length;
         setNotifsNonLues(nonLues);
+      } catch (err) {
+        console.error(err);
+      }
+      try {
+        const resConv = await api.get('/messages/conversations');
+        const total = (resConv.conversations || []).reduce((acc, c) => acc + Number(c.non_lus || 0), 0);
+        setMessagesNonLus(total);
       } catch (err) {
         console.error(err);
       }
@@ -96,6 +104,23 @@ export default function Header() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
+          {!loading && user && (
+            <Link
+              href="/messages"
+              className="hover-surface relative p-2 rounded-lg transition"
+              style={{ color: 'var(--txt2)' }}
+            >
+              <MessageCircle size={18} />
+              {messagesNonLus > 0 && (
+                <span
+                  className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
+                  style={{ backgroundColor: 'var(--bord)' }}
+                >
+                  {messagesNonLus > 9 ? '9+' : messagesNonLus}
+                </span>
+              )}
+            </Link>
+          )}
           {!loading && user && (
             <Link
               href="/profil/notifications"

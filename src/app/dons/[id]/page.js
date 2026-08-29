@@ -196,6 +196,9 @@ export default function DetailDonPage() {
               )}
             </div>
 
+            {don.numero && (
+              <p className="text-xs font-bold mb-1" style={{ color: 'var(--txt3)' }}>ID: #{String(don.numero).padStart(5, '0')}</p>
+            )}
             <h1 className="text-2xl font-extrabold mb-2" style={{ color: 'var(--txt)' }}>{don.titre}</h1>
             <p className="flex items-center gap-1.5 text-sm mb-6" style={{ color: 'var(--txt2)' }}>
               <MapPin size={15} /> {don.quartier}, {don.ville}

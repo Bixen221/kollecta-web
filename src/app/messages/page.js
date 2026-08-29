@@ -64,6 +64,12 @@ export default function MessagesPage() {
                       </span>
                     )}
                   </div>
+                  {conv.entite_titre && (
+                    <p className="text-xs font-semibold truncate mb-0.5" style={{ color: 'var(--or)' }}>
+                      {conv.entite_type === 'don' ? '🎁' : '🔨'} {conv.entite_titre}
+                      {conv.entite_numero && ` · ID: #${String(conv.entite_numero).padStart(5, '0')}`}
+                    </p>
+                  )}
                   <p className="text-sm truncate" style={{ color: 'var(--txt2)' }}>
                     {conv.dernier_message || 'Nouvelle conversation'}
                   </p>

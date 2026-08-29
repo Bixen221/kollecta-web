@@ -178,6 +178,9 @@ export default function DetailEncherePage() {
           </div>
 
           <div>
+            {enchere.numero && (
+              <p className="text-xs font-bold mb-1" style={{ color: 'var(--txt3)' }}>ID: #{String(enchere.numero).padStart(5, '0')}</p>
+            )}
             <h1 className="text-2xl font-extrabold mb-2" style={{ color: 'var(--txt)' }}>{enchere.titre}</h1>
             <p className="flex items-center gap-1.5 text-sm mb-6" style={{ color: 'var(--txt2)' }}>
               <MapPin size={15} /> {enchere.quartier}, {enchere.ville}
