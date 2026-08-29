@@ -8,6 +8,7 @@ import BoutonPartager from '@/components/BoutonPartager';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 import { useReservations } from '@/context/ReservationsContext';
+import { Send } from 'lucide-react';
 
 export default function DetailDonPage() {
   const { id } = useParams();
@@ -19,6 +20,8 @@ export default function DetailDonPage() {
   const [photoActive, setPhotoActive] = useState(0);
   const [zoomOuvert, setZoomOuvert] = useState(false);
   const [erreur, setErreur] = useState('');
+  const [candidats, setCandidats] = useState([]);
+  const [choixEnCours, setChoixEnCours] = useState(null);
 
   useEffect(() => {
     const charger = async () => {
@@ -33,6 +36,19 @@ export default function DetailDonPage() {
     };
     charger();
   }, [id]);
+
+  useEffect(() => {
+    if (!don || !user || don.proprietaire_id !== user.id) return;
+    const chargerCandidats = async () => {
+      try {
+        const res = await api.get(`/dons/${id}/candidats`);
+        setCandidats(res.candidats || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    chargerCandidats();
+  }, [don, user, id]);
 
   const handleReserver = async () => {
     if (!user) return router.push('/connexion');
@@ -65,6 +81,31 @@ export default function DetailDonPage() {
       router.push(`/messages/${res.conversation.id}`);
     } catch (err) {
       setErreur(err.message);
+    }
+  };
+
+  const handleChoisir = async (reservationId) => {
+    if (!confirm('Confirmer ce choix ? Les autres candidats en attente seront automatiquement refusés si c\'était la dernière disponibilité.')) return;
+    setChoixEnCours(reservationId);
+    try {
+      await api.post(`/dons/reservations/${reservationId}/choisir`);
+      const res = await api.get(`/dons/${id}/candidats`);
+      setCandidats(res.candidats || []);
+      const resDon = await api.get(`/dons/${id}`);
+      setDon(resDon.don);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setChoixEnCours(null);
+    }
+  };
+
+  const handleContacterCandidat = async (demandeurId) => {
+    try {
+      const res = await api.post('/messages/demarrer', { entite_type: 'don', entite_id: id, demandeur_id: demandeurId });
+      router.push(`/messages/${res.conversation.id}`);
+    } catch (err) {
+      alert(err.message);
     }
   };
 
@@ -210,6 +251,88 @@ export default function DetailDonPage() {
               </button>
             )}
 
+            {estProprio && candidats.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: 'var(--txt2)' }}>
+                  Candidats ({candidats.length})
+                </h3>
+                <div className="flex flex-col gap-3">
+                  {candidats.map((c) => (
+                    <div
+                      key={c.id}
+                      className="rounded-xl border p-4"
+                      style={{
+                        backgroundColor: c.statut === 'confirme_proprio' ? 'var(--grl)' : c.statut === 'refuse' ? 'var(--card2)' : 'var(--card)',
+                        borderColor: c.statut === 'confirme_proprio' ? 'var(--gr)' : 'var(--bd)',
+                        opacity: c.statut === 'refuse' ? 0.6 : 1,
+                      }}
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ backgroundColor: 'var(--bord)' }}>
+                          {c.prenom?.[0]}{c.nom?.[0]}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-sm" style={{ color: 'var(--txt)' }}>{c.prenom} {c.nom}</p>
+                          <p className="text-xs" style={{ color: 'var(--txt2)' }}>{c.quartier}, {c.ville}</p>
+                        </div>
+                        <p className="text-xs shrink-0" style={{ color: 'var(--txt3)' }}>
+                          {new Date(c.cree_le).toLocaleDateString('fr-SN')} à {new Date(c.cree_le).toLocaleTimeString('fr-SN', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                      {c.statut === 'contacte' || c.statut === 'confirme_proprio' || c.statut === 'confirme_demandeur' || c.statut === 'cloture' ? (
+                        <div className="flex flex-col gap-2">
+                          <div className="text-xs font-bold text-center py-1 rounded-lg" style={{ color: 'var(--gr)' }}>
+                            ✓ Choisi
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleContacterCandidat(c.demandeur_id)}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold border hover-surface transition"
+                              style={{ borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                            >
+                              <Send size={13} /> Écrire un message
+                            </button>
+                            {c.whatsapp && (
+                                <a
+                                href={`https://wa.me/${c.whatsapp.replace('+', '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-white transition"
+                                style={{ backgroundColor: '#25D366' }}
+                              >
+                                WhatsApp
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      ) : c.statut === 'refuse' ? (
+                        <div className="text-xs font-semibold text-center py-1.5 rounded-lg" style={{ color: 'var(--txt3)' }}>
+                          Non retenu
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleContacterCandidat(c.demandeur_id)}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold border hover-surface transition"
+                            style={{ borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                          >
+                            <Send size={13} /> Écrire un message
+                          </button>
+                          <button
+                            onClick={() => handleChoisir(c.id)}
+                            disabled={choixEnCours === c.id || don.quantite_dispo <= 0}
+                            className="flex-1 py-2 rounded-lg text-xs font-bold text-white btn-action transition disabled:opacity-50"
+                          >
+                            {choixEnCours === c.id ? '...' : 'Choisir'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {estProprio ? (
               <div className="px-4 py-4 rounded-xl text-sm font-semibold text-center" style={{ backgroundColor: 'var(--card2)', color: 'var(--txt2)' }}>
                 Ceci est votre annonce
@@ -217,7 +340,7 @@ export default function DetailDonPage() {
             ) : estReserve(id) ? (
               <div className="flex flex-col gap-3">
                 <div className="px-4 py-4 rounded-xl text-sm font-semibold" style={{ backgroundColor: 'var(--grl)', color: 'var(--gr)' }}>
-                  ✓ Réservé ! Le propriétaire vous contactera sur WhatsApp dans les 48h.
+                  ✓ Demande envoyée ! Le propriétaire vous contactera s'il vous choisit.
                 </div>
                 <button
                   onClick={handleAnnuler}

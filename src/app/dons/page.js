@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '@/services/api';
 import { useReservations } from '@/context/ReservationsContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function DonsPage() {
   const [dons,       setDons]       = useState([]);
@@ -14,8 +15,9 @@ export default function DonsPage() {
   const [page,       setPage]       = useState(1);
   const parPage = 12;
   const { estReserve, getReservation, charger: rechargerResas } = useReservations();
+  const { user } = useAuth();
 
-  const filtres = ['Tout', 'Nourriture', 'Matériels', 'Urgent'];
+  const filtres = ['Tout', 'Nourriture', 'Matériels', 'Urgent', 'Réservés'];
 
   useEffect(() => {
     const charger = async () => {
@@ -50,11 +52,15 @@ export default function DonsPage() {
     }
   };
 
-  const donsFiltres = dons.filter(d =>
-    d.titre?.toLowerCase().includes(recherche.toLowerCase()) ||
-    d.quartier?.toLowerCase().includes(recherche.toLowerCase()) ||
-    d.categorie?.toLowerCase().includes(recherche.toLowerCase())
-  );
+  console.log('DEBUG user.id:', user?.id, 'exemple don proprietaire_id:', dons[0]?.proprietaire_id, dons[1]?.proprietaire_id);
+  const donsFiltres = dons
+    .filter(d => d.proprietaire_id !== user?.id)
+    .filter(d => filtre === 'Réservés' ? estReserve(d.id) : !estReserve(d.id))
+    .filter(d =>
+      d.titre?.toLowerCase().includes(recherche.toLowerCase()) ||
+      d.quartier?.toLowerCase().includes(recherche.toLowerCase()) ||
+      d.categorie?.toLowerCase().includes(recherche.toLowerCase())
+    );
 
   const totalPages = Math.max(1, Math.ceil(donsFiltres.length / parPage));
   const donsPage = donsFiltres.slice((page - 1) * parPage, page * parPage);
@@ -157,7 +163,7 @@ export default function DonsPage() {
                       <button
                         onClick={(e) => handleAnnuler(don.id, e)}
                         className="w-full py-2 rounded-lg text-xs font-bold border"
-                        style={{ backgroundColor: '#FDE8EB', borderColor: '#FF6B6B', color: '#CC2222' }}
+                        style={{ backgroundColor: 'var(--grl)', borderColor: 'var(--gr)', color: 'var(--gr)' }}
                       >
                         Annuler la réservation
                       </button>
