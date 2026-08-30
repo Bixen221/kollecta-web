@@ -12,7 +12,7 @@ const API_URL = 'https://kollecta-backend.onrender.com/api';
 
 const CATEGORIES = {
   nourriture: ['Riz & Céréales', 'Légumes & Fruits', 'Viande & Poisson', 'Huile & Épices', 'Lait & Produits laitiers', 'Autre'],
-  materiel:   ['Vêtements', 'Scolaire', 'Électronique', 'Mobilier', 'Jouets', 'Autre'],
+  materiel:   ['Vêtements', 'Scolaire', 'Électronique', 'Mobilier', 'Jouets', 'Bébé', 'Autre'],
 };
 
 export default function PublierDonPage() {

@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 
 const API_URL = 'https://kollecta-backend.onrender.com/api';
 
-const CATEGORIES = ['Art', 'Électronique', 'Mode', 'Maison', 'Auto', 'Sport', 'Bijoux', 'Autre'];
+const CATEGORIES = ['Art', 'Électronique', 'Mode', 'Maison', 'Auto', 'Sport', 'Bijoux', 'Bébé', 'Autre'];
 
 const DUREES = [
   { label: '1 heure',   heures: 1 },
