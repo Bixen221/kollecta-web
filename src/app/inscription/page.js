@@ -7,7 +7,6 @@ import { Check, X, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import SelecteurPays from '@/components/SelecteurPays';
 import { PAYS, paysParDefaut } from '@/data/pays';
-import GoogleAuthButton from '@/components/GoogleAuthButton';
 
 export default function InscriptionPage() {
   const { inscription } = useAuth();
@@ -227,14 +226,6 @@ export default function InscriptionPage() {
             {loading ? 'Création...' : 'Créer mon compte'}
           </button>
         </form>
-
-        <div className="flex items-center gap-3 my-6">
-          <div className="flex-1 h-px" style={{ backgroundColor: 'var(--bd)' }} />
-          <span className="text-xs" style={{ color: 'var(--txt2)' }}>ou</span>
-          <div className="flex-1 h-px" style={{ backgroundColor: 'var(--bd)' }} />
-        </div>
-
-        <GoogleAuthButton />
 
         <p className="text-sm text-center mt-6" style={{ color: 'var(--txt2)' }}>
           Déjà un compte ?{' '}
