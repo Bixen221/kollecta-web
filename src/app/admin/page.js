@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, TrendingUp, Users, Gift, Hammer, Star, ShieldAlert, ImageOff, Trash2, ShieldCheck, Download } from 'lucide-react';
+import { LogOut, TrendingUp, Users, Gift, Hammer, Star, ShieldAlert, ImageOff, Trash2, ShieldCheck, Download, MessageCircle } from 'lucide-react';
 import { exporterCsv } from '@/utils/exportCsv';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
@@ -245,6 +245,39 @@ export default function AdminPage() {
                 sous="Somme des offres actuelles sur enchères actives"
               />
               <KpiCard icon={Hammer} label="Réservations totales" value={stats.total_reservations} />
+            </div>
+
+            {/* CANDIDATURES (WORKFLOW RESERVATION) */}
+            <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: 'var(--txt3)' }}>Candidatures (dons)</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+              <KpiCard
+                icon={Gift}
+                label="En attente"
+                value={stats.candidatures_en_attente}
+                couleur={stats.candidatures_en_attente > 0 ? 'var(--or)' : 'var(--gr)'}
+              />
+              <KpiCard icon={Gift} label="Contactées" value={stats.candidatures_contactees} />
+              <KpiCard icon={Gift} label="Refusées" value={stats.candidatures_refusees} />
+              <KpiCard
+                icon={ShieldAlert}
+                label="En attente +3 jours"
+                value={stats.candidatures_stagnantes}
+                couleur={stats.candidatures_stagnantes > 0 ? 'var(--bord)' : 'var(--gr)'}
+                sous="Propriétaires inactifs"
+              />
+            </div>
+
+            {/* MESSAGERIE */}
+            <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: 'var(--txt3)' }}>Messagerie</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+              <KpiCard
+                icon={MessageCircle}
+                label="Conversations"
+                value={stats.total_conversations}
+                sous={`${stats.conversations_dons} dons · ${stats.conversations_encheres} enchères`}
+              />
+              <KpiCard icon={MessageCircle} label="Messages totaux" value={stats.total_messages} sous={`${stats.nouveaux_messages_7j} sur 7 jours`} />
+              <KpiCard icon={MessageCircle} label="Messages non lus" value={stats.messages_non_lus} />
             </div>
 
             {/* MODERATION */}
