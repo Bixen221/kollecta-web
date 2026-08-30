@@ -15,6 +15,7 @@ export default function InscriptionPage() {
   const [form, setForm] = useState({
     nom: '', prenom: '', numeroLocal: '', password: '', confirmPassword: '', quartier: '', ville: paysParDefaut.capitale,
   });
+  const [etape, setEtape] = useState(1);
   const [erreur,  setErreur]  = useState('');
   const [loading, setLoading] = useState(false);
   const [voirPassword,        setVoirPassword]        = useState(false);
@@ -48,13 +49,21 @@ export default function InscriptionPage() {
   const motsDePasseIdentiques = form.password.length > 0 && form.password === form.confirmPassword;
   const numeroComplet = form.numeroLocal.length === pays.longueur;
 
+  const passerEtape2 = () => {
+    setErreur('');
+    if (!form.prenom || !form.nom) {
+      return setErreur('Veuillez renseigner votre prénom et nom.');
+    }
+    if (!numeroComplet) {
+      return setErreur(`Le numéro doit contenir ${pays.longueur} chiffres pour ${pays.nom}.`);
+    }
+    setEtape(2);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErreur('');
 
-    if (!numeroComplet) {
-      return setErreur(`Le numéro doit contenir ${pays.longueur} chiffres pour ${pays.nom}.`);
-    }
     if (!critereLongueur) {
       return setErreur('Le mot de passe doit contenir au moins 4 caractères.');
     }
@@ -110,121 +119,153 @@ export default function InscriptionPage() {
           </div>
         )}
 
+        {/* INDICATEUR D'ÉTAPE */}
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: 'var(--or)' }} />
+          <div className="w-10 h-0.5" style={{ backgroundColor: etape === 2 ? 'var(--or)' : 'var(--bd)' }} />
+          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: etape === 2 ? 'var(--or)' : 'var(--bd)' }} />
+        </div>
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Prénom</label>
-              <input
-                type="text" required value={form.prenom} onChange={(e) => update('prenom', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border outline-none focus:ring-2"
-                style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Nom</label>
-              <input
-                type="text" required value={form.nom} onChange={(e) => update('nom', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border outline-none focus:ring-2"
-                style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
-              />
-            </div>
-          </div>
+          {etape === 1 ? (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Prénom</label>
+                  <input
+                    type="text" required value={form.prenom} onChange={(e) => update('prenom', e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border outline-none focus:ring-2"
+                    style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Nom</label>
+                  <input
+                    type="text" required value={form.nom} onChange={(e) => update('nom', e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border outline-none focus:ring-2"
+                    style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                  />
+                </div>
+              </div>
 
-          <div>
-            <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Numéro WhatsApp</label>
-            <div className="flex gap-2">
-              <SelecteurPays paysSelectionne={pays} onChange={handleChangerPays} />
-              <input
-                type="tel" placeholder={'X'.repeat(pays.longueur)} required
-                value={form.numeroLocal} onChange={(e) => handleNumeroChange(e.target.value)}
-                className="flex-1 min-w-0 px-4 py-3 rounded-lg border outline-none focus:ring-2"
-                style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
-              />
-            </div>
-            {form.numeroLocal.length > 0 && (
-              <p className="text-xs mt-1.5" style={{ color: numeroComplet ? 'var(--gr)' : 'var(--txt3)' }}>
-                {form.numeroLocal.length}/{pays.longueur} chiffres
-              </p>
-            )}
-          </div>
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Numéro WhatsApp</label>
+                <div className="flex gap-2">
+                  <SelecteurPays paysSelectionne={pays} onChange={handleChangerPays} />
+                  <input
+                    type="tel" placeholder={'X'.repeat(pays.longueur)} required
+                    value={form.numeroLocal} onChange={(e) => handleNumeroChange(e.target.value)}
+                    className="flex-1 min-w-0 px-4 py-3 rounded-lg border outline-none focus:ring-2"
+                    style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                  />
+                </div>
+                {form.numeroLocal.length > 0 && (
+                  <p className="text-xs mt-1.5" style={{ color: numeroComplet ? 'var(--gr)' : 'var(--txt3)' }}>
+                    {form.numeroLocal.length}/{pays.longueur} chiffres
+                  </p>
+                )}
+              </div>
 
-          <div>
-            <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Mot de passe</label>
-            <div className="relative">
-              <input
-                type={voirPassword ? 'text' : 'password'} placeholder="4 caractères minimum" required
-                value={form.password} onChange={(e) => update('password', e.target.value)}
-                className="w-full px-4 py-3 pr-11 rounded-lg border outline-none focus:ring-2"
-                style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
-              />
               <button
                 type="button"
-                onClick={() => setVoirPassword(!voirPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-                style={{ color: 'var(--txt3)' }}
+                onClick={passerEtape2}
+                className="mt-2 py-3.5 rounded-lg font-bold text-white hover:opacity-90 transition"
+                style={{ backgroundColor: 'var(--bord)' }}
               >
-                {voirPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                Continuer →
               </button>
-            </div>
-            {form.password.length > 0 && (
-              <div className="mt-2">
-                <Critere valide={critereLongueur} texte="4 caractères minimum" />
+            </>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Quartier</label>
+                  <input
+                    type="text" placeholder="Plateau..." value={form.quartier} onChange={(e) => update('quartier', e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border outline-none focus:ring-2"
+                    style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Ville</label>
+                  <input
+                    type="text" value={form.ville} onChange={(e) => update('ville', e.target.value)}
+                    className="w-full px-4 py-3 rounded-lg border outline-none focus:ring-2"
+                    style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                  />
+                </div>
               </div>
-            )}
-          </div>
 
-          <div>
-            <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Confirmer le mot de passe</label>
-            <div className="relative">
-              <input
-                type={voirConfirmPassword ? 'text' : 'password'} placeholder="Retapez le mot de passe" required
-                value={form.confirmPassword} onChange={(e) => update('confirmPassword', e.target.value)}
-                className="w-full px-4 py-3 pr-11 rounded-lg border outline-none focus:ring-2"
-                style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
-              />
-              <button
-                type="button"
-                onClick={() => setVoirConfirmPassword(!voirConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-                style={{ color: 'var(--txt3)' }}
-              >
-                {voirConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-            {form.confirmPassword.length > 0 && (
-              <div className="flex items-center gap-1.5 mt-2 text-xs" style={{ color: motsDePasseIdentiques ? 'var(--gr)' : '#CC2222' }}>
-                {motsDePasseIdentiques ? <Check size={13} /> : <X size={13} />}
-                {motsDePasseIdentiques ? 'Les mots de passe correspondent' : 'Les mots de passe ne correspondent pas'}
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Mot de passe</label>
+                <div className="relative">
+                  <input
+                    type={voirPassword ? 'text' : 'password'} placeholder="4 caractères minimum" required
+                    value={form.password} onChange={(e) => update('password', e.target.value)}
+                    className="w-full px-4 py-3 pr-11 rounded-lg border outline-none focus:ring-2"
+                    style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setVoirPassword(!voirPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    style={{ color: 'var(--txt3)' }}
+                  >
+                    {voirPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {form.password.length > 0 && (
+                  <div className="mt-2">
+                    <Critere valide={critereLongueur} texte="4 caractères minimum" />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Quartier</label>
-              <input
-                type="text" placeholder="Plateau..." value={form.quartier} onChange={(e) => update('quartier', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border outline-none focus:ring-2"
-                style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Ville</label>
-              <input
-                type="text" value={form.ville} onChange={(e) => update('ville', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border outline-none focus:ring-2"
-                style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
-              />
-            </div>
-          </div>
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wide mb-1.5 block" style={{ color: 'var(--txt2)' }}>Confirmer le mot de passe</label>
+                <div className="relative">
+                  <input
+                    type={voirConfirmPassword ? 'text' : 'password'} placeholder="Retapez le mot de passe" required
+                    value={form.confirmPassword} onChange={(e) => update('confirmPassword', e.target.value)}
+                    className="w-full px-4 py-3 pr-11 rounded-lg border outline-none focus:ring-2"
+                    style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--bd)', color: 'var(--txt)' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setVoirConfirmPassword(!voirConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    style={{ color: 'var(--txt3)' }}
+                  >
+                    {voirConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {form.confirmPassword.length > 0 && (
+                  <div className="flex items-center gap-1.5 mt-2 text-xs" style={{ color: motsDePasseIdentiques ? 'var(--gr)' : '#CC2222' }}>
+                    {motsDePasseIdentiques ? <Check size={13} /> : <X size={13} />}
+                    {motsDePasseIdentiques ? 'Les mots de passe correspondent' : 'Les mots de passe ne correspondent pas'}
+                  </div>
+                )}
+              </div>
 
-          <button
-            type="submit" disabled={loading}
-            className="mt-2 py-3.5 rounded-lg font-bold text-white hover:opacity-90 transition disabled:opacity-60"
-            style={{ backgroundColor: 'var(--bord)' }}
-          >
-            {loading ? 'Création...' : 'Créer mon compte'}
-          </button>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setEtape(1)}
+                  className="flex-1 py-3.5 rounded-lg font-bold border hover:opacity-80 transition"
+                  style={{ borderColor: 'var(--bd)', color: 'var(--txt2)' }}
+                >
+                  ← Retour
+                </button>
+                <button
+                  type="submit" disabled={loading}
+                  className="flex-[2] py-3.5 rounded-lg font-bold text-white hover:opacity-90 transition disabled:opacity-60"
+                  style={{ backgroundColor: 'var(--bord)' }}
+                >
+                  {loading ? 'Création...' : 'Créer mon compte'}
+                </button>
+              </div>
+            </>
+          )}
         </form>
 
         <p className="text-sm text-center mt-6" style={{ color: 'var(--txt2)' }}>
