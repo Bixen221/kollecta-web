@@ -10,8 +10,10 @@ const getTempsRestant = (fin_le) => {
   if (diff <= 0) return 'Terminée';
   const h = Math.floor(diff / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
   if (h > 24) return Math.floor(h / 24) + 'j ' + (h % 24) + 'h';
-  return h + 'h ' + m + 'm';
+  if (h >= 1) return h + 'h ' + m + 'm';
+  return m + 'm ' + s + 's';
 };
 
 const estReellementTerminee = (e) => e.statut === 'termine' || new Date(e.fin_le) <= new Date();
